@@ -1,0 +1,6 @@
+{
+  "name": "Proo AI",
+  "description": "A high-performance AI workstation featuring real-time conversational intelligence, dedicated 8K Image Studio, and unlimited 8-second AI Video Studio.",
+  "requestFramePermissions": ["microphone"],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}

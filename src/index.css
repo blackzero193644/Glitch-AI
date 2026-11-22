@@ -1,0 +1,76 @@
+@import "tailwindcss";
+
+@layer base {
+  :root {
+    --glitch-bg: #04050c;
+    --glitch-surface: #090c1a;
+    --glitch-surface-elevated: #0e1329;
+    --glitch-border: #192241;
+    --glitch-cyan: #22d3ee;
+    --glitch-indigo: #6366f1;
+    --glitch-magenta: #e83cff;
+  }
+
+  body {
+    font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, sans-serif;
+    background-color: #04050c;
+    color: #f1f5f9;
+    margin: 0;
+    padding: 0;
+    overflow: hidden;
+  }
+
+  h1, h2, h3, .font-display {
+    font-family: 'Outfit', 'Plus Jakarta Sans', sans-serif;
+  }
+
+  code, pre, .font-mono {
+    font-family: 'JetBrains Mono', ui-monospace, SFMono-Regular, monospace;
+  }
+}
+
+.tabular-nums {
+  font-variant-numeric: tabular-nums;
+}
+
+.glitch-gradient-text {
+  background: linear-gradient(110deg, #38bdf8 0%, #6366f1 50%, #ec4899 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+
+.glitch-btn-primary {
+  background: linear-gradient(120deg, #06b6d4 0%, #6366f1 55%, #d946ef 100%);
+  color: #ffffff;
+  transition: filter 160ms ease, transform 160ms ease, box-shadow 160ms ease;
+}
+
+.glitch-btn-primary:hover:not(:disabled) {
+  filter: brightness(1.1);
+  box-shadow: 0 8px 26px -6px rgba(34, 211, 238, 0.35), 0 6px 20px -6px rgba(217, 70, 239, 0.3);
+}
+
+/* Custom Sleek Scrollbar */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  background: rgba(34, 211, 238, 0.22);
+  border-radius: 9999px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: rgba(217, 70, 239, 0.45);
+}
+
+.scrollbar-thin {
+  scrollbar-width: thin;
+  scrollbar-color: rgba(34, 211, 238, 0.25) transparent;
+}

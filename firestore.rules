@@ -1,0 +1,348 @@
+rules_version = '2';
+
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // Global safety net: default deny all access
+    match /{document=**} {
+      allow read, write: if false;
+    }
+
+    // Helper functions
+    function isSignedIn() {
+      return request.auth != null;
+    }
+
+    function isVerified() {
+      return isSignedIn() && request.auth.token.email_verified == true;
+    }
+
+    function isOwner(userId) {
+      return isSignedIn() && request.auth.uid == userId;
+    }
+
+    function incoming() {
+      return request.resource.data;
+    }
+
+    function existing() {
+      return resource.data;
+    }
+
+    function isValidId(id) {
+      return id is string && id.size() > 0 && id.size() <= 128 && id.matches('^[a-zA-Z0-9_\\-]+$');
+    }
+
+    // Validate UserProfile payload (matches firebase-blueprint.json)
+    function isValidUserProfile(data) {
+      return data.keys().hasAll(['userId', 'name', 'credits'])
+        && data.keys().hasOnly([
+          'userId',
+          'name',
+          'email',
+          'role',
+          'avatarColor',
+          'customAvatar',
+          'customInstructions',
+          'preferredTone',
+          'credits',
+          'lastClaimedTransferId',
+          'createdAt',
+          'updatedAt'
+        ])
+        && data.userId is string && isValidId(data.userId) && data.userId == request.auth.uid
+        && data.name is string && data.name.size() > 0 && data.name.size() <= 60
+        && data.credits is int && data.credits >= 0 && data.credits <= 10000
+        && (!('email' in data) || (data.email is string && data.email.size() <= 120))
+        && (!('role' in data) || (data.role is string && data.role.size() <= 60))
+        && (!('avatarColor' in data) || (data.avatarColor is string && data.avatarColor.size() <= 30))
+        && (!('customAvatar' in data) || (data.customAvatar is string && data.customAvatar.size() <= 200000))
+        && (!('customInstructions' in data) || (data.customInstructions is string && data.customInstructions.size() <= 500))
+        && (!('preferredTone' in data) || (data.preferredTone is string && data.preferredTone.size() <= 30))
+        && (!('lastClaimedTransferId' in data) || (data.lastClaimedTransferId is string && isValidId(data.lastClaimedTransferId)));
+    }
+
+    // Validate ChatThread payload (matches firebase-blueprint.json)
+    function isValidChatThread(data) {
+      return data.keys().hasAll(['id', 'userId', 'title'])
+        && data.keys().hasOnly([
+          'id',
+          'userId',
+          'title',
+          'tone',
+          'messageCount',
+          'lastMessageSnippet',
+          'createdAt',
+          'updatedAt'
+        ])
+        && data.id is string && isValidId(data.id)
+        && data.userId is string && isValidId(data.userId) && data.userId == request.auth.uid
+        && data.title is string && data.title.size() > 0 && data.title.size() <= 100
+        && (!('tone' in data) || (data.tone is string && data.tone.size() <= 30))
+        && (!('messageCount' in data) || (data.messageCount is number && data.messageCount >= 0))
+        && (!('lastMessageSnippet' in data) || (data.lastMessageSnippet is string && data.lastMessageSnippet.size() <= 250));
+    }
+
+    // Validate ChatMessage payload (matches firebase-blueprint.json)
+    function isValidChatMessage(data) {
+      return data.keys().hasAll(['id', 'threadId', 'userId', 'role', 'content'])
+        && data.keys().hasOnly([
+          'id',
+          'threadId',
+          'userId',
+          'role',
+          'content',
+          'timestamp',
+          'mediaType',
+          'generatedImageUrl',
+          'createdAt'
+        ])
+        && data.id is string && isValidId(data.id)
+        && data.threadId is string && isValidId(data.threadId)
+        && data.userId is string && isValidId(data.userId) && data.userId == request.auth.uid
+        && data.role is string && (data.role == 'user' || data.role == 'assistant')
+        && data.content is string && data.content.size() <= 100000
+        && (!('timestamp' in data) || (data.timestamp is number && data.timestamp >= 0))
+        && (!('mediaType' in data) || (data.mediaType is string && (data.mediaType == 'image' || data.mediaType == 'video')))
+        && (!('generatedImageUrl' in data) || (data.generatedImageUrl is string && data.generatedImageUrl.size() <= 850000));
+    }
+
+    // Validate privacy-preserving CreditDirectoryEntry payload
+    function isValidCreditDirectoryEntry(data) {
+      return data.keys().hasAll(['lookupId', 'userId', 'displayName', 'updatedAt'])
+        && data.keys().hasOnly(['lookupId', 'userId', 'displayName', 'updatedAt'])
+        && data.lookupId is string && isValidId(data.lookupId)
+        && data.userId is string && isValidId(data.userId) && data.userId == request.auth.uid
+        && data.displayName is string && data.displayName.size() > 0 && data.displayName.size() <= 60;
+    }
+
+    // Validate atomic CreditTransfer payload
+    function isValidCreditTransfer(data) {
+      return data.keys().hasAll(['id', 'fromUserId', 'fromName', 'toUserId', 'toName', 'amount', 'status', 'createdAt'])
+        && data.keys().hasOnly([
+          'id',
+          'fromUserId',
+          'fromName',
+          'toUserId',
+          'toName',
+          'amount',
+          'note',
+          'status',
+          'createdAt',
+          'claimedAt'
+        ])
+        && data.id is string && isValidId(data.id)
+        && data.fromUserId is string && isValidId(data.fromUserId)
+        && data.toUserId is string && isValidId(data.toUserId)
+        && data.fromName is string && data.fromName.size() > 0 && data.fromName.size() <= 60
+        && data.toName is string && data.toName.size() > 0 && data.toName.size() <= 60
+        && data.amount is int && data.amount >= 1 && data.amount <= 1000
+        && (data.status == 'pending' || data.status == 'claimed')
+        && (!('note' in data) || (data.note is string && data.note.size() <= 120));
+    }
+
+    // Connection validation test probe (single-doc get only)
+    match /test/connection {
+      allow get: if true;
+      allow list, write: if false;
+    }
+
+    // Privacy-preserving recipient lookup index (single-doc get by signed-in user; no list/enumeration)
+    match /creditDirectory/{lookupId} {
+      allow get: if isSignedIn() && isValidId(lookupId);
+      allow list: if false;
+      allow create, update: if isSignedIn()
+        && isVerified()
+        && isValidId(lookupId)
+        && isValidCreditDirectoryEntry(incoming())
+        && incoming().lookupId == lookupId
+        && incoming().userId == request.auth.uid
+        && incoming().updatedAt == request.time
+        && (
+          lookupId == ('uid_' + request.auth.uid)
+          || lookupId.matches('^email_[a-f0-9]{64}$')
+        );
+      allow delete: if false;
+    }
+
+    // Atomic two-phase user-to-user credit transfers
+    match /creditTransfers/{transferId} {
+      allow get: if isSignedIn()
+        && isValidId(transferId)
+        && (resource.data.fromUserId == request.auth.uid || resource.data.toUserId == request.auth.uid);
+      allow list: if isSignedIn()
+        && (resource.data.fromUserId == request.auth.uid || resource.data.toUserId == request.auth.uid);
+      allow create: if isSignedIn()
+        && isVerified()
+        && isValidId(transferId)
+        && isValidCreditTransfer(incoming())
+        && incoming().id == transferId
+        && incoming().fromUserId == request.auth.uid
+        && incoming().toUserId != request.auth.uid
+        && incoming().status == 'pending'
+        && incoming().createdAt == request.time
+        && !('claimedAt' in incoming())
+        && exists(/databases/$(database)/documents/users/$(incoming().toUserId))
+        && getAfter(/databases/$(database)/documents/users/$(request.auth.uid)).data.credits
+          == get(/databases/$(database)/documents/users/$(request.auth.uid)).data.credits - incoming().amount;
+      allow update: if isSignedIn()
+        && isVerified()
+        && isValidId(transferId)
+        && existing().status == 'pending'
+        && existing().toUserId == request.auth.uid
+        && isValidCreditTransfer(incoming())
+        && incoming().id == existing().id
+        && incoming().fromUserId == existing().fromUserId
+        && incoming().toUserId == existing().toUserId
+        && incoming().amount == existing().amount
+        && incoming().createdAt == existing().createdAt
+        && incoming().status == 'claimed'
+        && incoming().claimedAt == request.time
+        && incoming().diff(existing()).affectedKeys().hasOnly(['status', 'claimedAt'])
+        && getAfter(/databases/$(database)/documents/users/$(request.auth.uid)).data.credits
+          == get(/databases/$(database)/documents/users/$(request.auth.uid)).data.credits + existing().amount;
+      allow delete: if false;
+    }
+
+    // Permanent User Account Documents (non-deletable, bounded credit mutations)
+    match /users/{userId} {
+      allow get: if isOwner(userId) && isValidId(userId);
+      allow list: if false;
+      allow create: if isOwner(userId)
+        && isVerified()
+        && isValidId(userId)
+        && isValidUserProfile(incoming())
+        && incoming().userId == userId
+        && incoming().credits == 100
+        && incoming().createdAt == request.time
+        && incoming().updatedAt == request.time;
+      allow update: if isOwner(userId)
+        && isVerified()
+        && isValidId(userId)
+        && isValidUserProfile(incoming())
+        && incoming().userId == existing().userId
+        && (!('createdAt' in existing()) || incoming().createdAt == existing().createdAt)
+        && incoming().updatedAt == request.time
+        && (
+          // Action 1: Update profile preferences (credits must remain unchanged)
+          (
+            'credits' in existing()
+            && incoming().diff(existing()).affectedKeys().hasOnly([
+              'name',
+              'role',
+              'avatarColor',
+              'customAvatar',
+              'customInstructions',
+              'preferredTone',
+              'email',
+              'updatedAt'
+            ])
+            && incoming().credits == existing().credits
+          )
+          // Action 2: One-time migration for legacy user doc created without credits
+          || (
+            !('credits' in existing())
+            && incoming().diff(existing()).affectedKeys().hasOnly(['credits', 'updatedAt'])
+            && incoming().credits == 100
+          )
+          // Action 3: Atomic credit deduction (image generation or outgoing transfer)
+          || (
+            'credits' in existing()
+            && incoming().diff(existing()).affectedKeys().hasOnly(['credits', 'updatedAt'])
+            && incoming().credits is int
+            && incoming().credits >= 0
+            && incoming().credits < existing().credits
+          )
+          // Action 4: Lucky ad reward (+1 to +10 credits per completed ad view)
+          || (
+            'credits' in existing()
+            && incoming().diff(existing()).affectedKeys().hasOnly(['credits', 'updatedAt'])
+            && incoming().credits is int
+            && incoming().credits > existing().credits
+            && incoming().credits <= existing().credits + 10
+            && incoming().credits <= 10000
+          )
+          // Action 5: Claim incoming credit transfer atomically via getAfter
+          || (
+            'credits' in existing()
+            && incoming().diff(existing()).affectedKeys().hasOnly(['credits', 'lastClaimedTransferId', 'updatedAt'])
+            && incoming().lastClaimedTransferId is string
+            && isValidId(incoming().lastClaimedTransferId)
+            && exists(/databases/$(database)/documents/creditTransfers/$(incoming().lastClaimedTransferId))
+            && get(/databases/$(database)/documents/creditTransfers/$(incoming().lastClaimedTransferId)).data.toUserId == userId
+            && get(/databases/$(database)/documents/creditTransfers/$(incoming().lastClaimedTransferId)).data.status == 'pending'
+            && incoming().credits is int
+            && incoming().credits == existing().credits + get(/databases/$(database)/documents/creditTransfers/$(incoming().lastClaimedTransferId)).data.amount
+            && incoming().credits <= 10000
+            && getAfter(/databases/$(database)/documents/creditTransfers/$(incoming().lastClaimedTransferId)).data.status == 'claimed'
+          )
+        );
+      allow delete: if false;
+
+      // User Conversation Threads
+      match /threads/{threadId} {
+        allow get: if isOwner(userId) && isValidId(userId) && isValidId(threadId);
+        allow list: if isOwner(userId) && resource.data.userId == request.auth.uid;
+        allow create: if isOwner(userId)
+          && isVerified()
+          && isValidId(userId)
+          && isValidId(threadId)
+          && isValidChatThread(incoming())
+          && incoming().id == threadId
+          && incoming().createdAt == request.time
+          && incoming().updatedAt == request.time
+          && exists(/databases/$(database)/documents/users/$(userId));
+        allow update: if isOwner(userId)
+          && isVerified()
+          && isValidId(userId)
+          && isValidId(threadId)
+          && isValidChatThread(incoming())
+          && incoming().id == existing().id
+          && incoming().userId == existing().userId
+          && (!('createdAt' in existing()) || incoming().createdAt == existing().createdAt)
+          && incoming().updatedAt == request.time
+          && incoming().diff(existing()).affectedKeys().hasOnly([
+            'title',
+            'tone',
+            'messageCount',
+            'lastMessageSnippet',
+            'updatedAt'
+          ]);
+        allow delete: if isOwner(userId) && isValidId(userId) && isValidId(threadId);
+
+        // Individual Messages
+        match /messages/{messageId} {
+          allow get: if isOwner(userId) && isValidId(userId) && isValidId(threadId) && isValidId(messageId);
+          allow list: if isOwner(userId) && resource.data.userId == request.auth.uid;
+          allow create: if isOwner(userId)
+            && isVerified()
+            && isValidId(userId)
+            && isValidId(threadId)
+            && isValidId(messageId)
+            && isValidChatMessage(incoming())
+            && incoming().id == messageId
+            && incoming().threadId == threadId
+            && incoming().createdAt == request.time
+            && exists(/databases/$(database)/documents/users/$(userId)/threads/$(threadId));
+          allow update: if isOwner(userId)
+            && isVerified()
+            && isValidId(userId)
+            && isValidId(threadId)
+            && isValidId(messageId)
+            && isValidChatMessage(incoming())
+            && incoming().id == existing().id
+            && incoming().threadId == existing().threadId
+            && incoming().userId == existing().userId
+            && (!('createdAt' in existing()) || incoming().createdAt == existing().createdAt)
+            && incoming().diff(existing()).affectedKeys().hasOnly([
+              'content',
+              'mediaType',
+              'generatedImageUrl',
+              'timestamp'
+            ]);
+          allow delete: if isOwner(userId) && isValidId(userId) && isValidId(threadId) && isValidId(messageId);
+        }
+      }
+    }
+  }
+}

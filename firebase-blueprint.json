@@ -1,0 +1,277 @@
+{
+  "entities": {
+    "UserProfile": {
+      "title": "UserProfile",
+      "description": "Permanent user account profile, credit balance, avatar configuration, and personalized Glitch AI v1.0 preferences",
+      "type": "object",
+      "properties": {
+        "userId": {
+          "type": "string",
+          "description": "The Firebase Auth UID of the user",
+          "maxLength": 128
+        },
+        "name": {
+          "type": "string",
+          "description": "Display name of the user",
+          "maxLength": 60
+        },
+        "email": {
+          "type": "string",
+          "description": "Email address of the user",
+          "maxLength": 120
+        },
+        "role": {
+          "type": "string",
+          "description": "User role or focus area",
+          "maxLength": 60
+        },
+        "avatarColor": {
+          "type": "string",
+          "description": "Color theme id for the default avatar",
+          "maxLength": 30
+        },
+        "customAvatar": {
+          "type": "string",
+          "description": "Base64 data URL of user uploaded device profile picture",
+          "maxLength": 200000
+        },
+        "customInstructions": {
+          "type": "string",
+          "description": "Custom prompt instructions injected into Glitch AI",
+          "maxLength": 500
+        },
+        "preferredTone": {
+          "type": "string",
+          "description": "Preferred default conversation tone",
+          "maxLength": 30
+        },
+        "credits": {
+          "type": "integer",
+          "description": "Remaining credit balance (starts at 100, 0-10 lucky credits per ad view, transferable between users)"
+        },
+        "lastClaimedTransferId": {
+          "type": "string",
+          "description": "Most recently claimed incoming credit transfer document ID",
+          "maxLength": 128
+        },
+        "createdAt": {
+          "type": "string",
+          "format": "date-time",
+          "description": "Server timestamp of profile creation"
+        },
+        "updatedAt": {
+          "type": "string",
+          "format": "date-time",
+          "description": "Server timestamp of latest profile update"
+        }
+      },
+      "required": ["userId", "name", "credits"]
+    },
+    "ChatThread": {
+      "title": "ChatThread",
+      "description": "Conversation thread metadata belonging to a user",
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Unique identifier of the chat thread",
+          "maxLength": 128
+        },
+        "userId": {
+          "type": "string",
+          "description": "UID of the thread owner",
+          "maxLength": 128
+        },
+        "title": {
+          "type": "string",
+          "description": "Thread title",
+          "maxLength": 100
+        },
+        "tone": {
+          "type": "string",
+          "description": "Conversation tone configuration",
+          "maxLength": 30
+        },
+        "messageCount": {
+          "type": "number",
+          "description": "Total number of messages in thread"
+        },
+        "lastMessageSnippet": {
+          "type": "string",
+          "description": "Preview snippet of the last message",
+          "maxLength": 250
+        },
+        "createdAt": {
+          "type": "string",
+          "format": "date-time",
+          "description": "Server timestamp when thread was created"
+        },
+        "updatedAt": {
+          "type": "string",
+          "format": "date-time",
+          "description": "Server timestamp when thread was updated"
+        }
+      },
+      "required": ["id", "userId", "title"]
+    },
+    "ChatMessage": {
+      "title": "ChatMessage",
+      "description": "An individual message within a chat thread",
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Unique identifier of the message",
+          "maxLength": 128
+        },
+        "threadId": {
+          "type": "string",
+          "description": "ID of the parent chat thread",
+          "maxLength": 128
+        },
+        "userId": {
+          "type": "string",
+          "description": "UID of the user who owns this message or thread",
+          "maxLength": 128
+        },
+        "role": {
+          "type": "string",
+          "description": "Role of the author: user or assistant",
+          "enum": ["user", "assistant"]
+        },
+        "content": {
+          "type": "string",
+          "description": "Text body of the message",
+          "maxLength": 100000
+        },
+        "timestamp": {
+          "type": "number",
+          "description": "Client epoch timestamp"
+        },
+        "mediaType": {
+          "type": "string",
+          "description": "Optional media attachment type",
+          "enum": ["image", "video"]
+        },
+        "generatedImageUrl": {
+          "type": "string",
+          "description": "Compressed image URL or data URL for persisted visual outputs",
+          "maxLength": 850000
+        },
+        "createdAt": {
+          "type": "string",
+          "format": "date-time",
+          "description": "Server timestamp when message was created"
+        }
+      },
+      "required": ["id", "threadId", "userId", "role", "content"]
+    },
+    "CreditDirectoryEntry": {
+      "title": "CreditDirectoryEntry",
+      "description": "Privacy-preserving lookup index mapping hashed email or UID tokens to recipient display info without exposing plaintext emails",
+      "type": "object",
+      "properties": {
+        "lookupId": {
+          "type": "string",
+          "description": "Lookup key: uid_<userId> or email_<sha256>",
+          "maxLength": 128
+        },
+        "userId": {
+          "type": "string",
+          "description": "Target Firebase Auth UID",
+          "maxLength": 128
+        },
+        "displayName": {
+          "type": "string",
+          "description": "Public recipient display name",
+          "maxLength": 60
+        },
+        "updatedAt": {
+          "type": "string",
+          "format": "date-time",
+          "description": "Server timestamp of latest directory update"
+        }
+      },
+      "required": ["lookupId", "userId", "displayName", "updatedAt"]
+    },
+    "CreditTransfer": {
+      "title": "CreditTransfer",
+      "description": "Atomic two-phase credit transfer record between signed-in users",
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Unique credit transfer document ID",
+          "maxLength": 128
+        },
+        "fromUserId": {
+          "type": "string",
+          "description": "Sender Firebase Auth UID",
+          "maxLength": 128
+        },
+        "fromName": {
+          "type": "string",
+          "description": "Sender display name",
+          "maxLength": 60
+        },
+        "toUserId": {
+          "type": "string",
+          "description": "Recipient Firebase Auth UID",
+          "maxLength": 128
+        },
+        "toName": {
+          "type": "string",
+          "description": "Recipient display name",
+          "maxLength": 60
+        },
+        "amount": {
+          "type": "integer",
+          "description": "Credits transferred (1 to 1000)"
+        },
+        "note": {
+          "type": "string",
+          "description": "Optional transfer note",
+          "maxLength": 120
+        },
+        "status": {
+          "type": "string",
+          "description": "Transfer lifecycle state",
+          "enum": ["pending", "claimed"]
+        },
+        "createdAt": {
+          "type": "string",
+          "format": "date-time",
+          "description": "Server timestamp when transfer was sent"
+        },
+        "claimedAt": {
+          "type": "string",
+          "format": "date-time",
+          "description": "Server timestamp when recipient claimed credits"
+        }
+      },
+      "required": ["id", "fromUserId", "fromName", "toUserId", "toName", "amount", "status", "createdAt"]
+    }
+  },
+  "firestore": {
+    "/users/{userId}": {
+      "schema": "UserProfile",
+      "description": "Permanent user profile and credit balance documents isolating user private data"
+    },
+    "/users/{userId}/threads/{threadId}": {
+      "schema": "ChatThread",
+      "description": "Chat conversation threads owned by the user"
+    },
+    "/users/{userId}/threads/{threadId}/messages/{messageId}": {
+      "schema": "ChatMessage",
+      "description": "Individual messages belonging to a chat thread"
+    },
+    "/creditDirectory/{lookupId}": {
+      "schema": "CreditDirectoryEntry",
+      "description": "Hashed-email and UID recipient lookup entries (single-doc get only, listing forbidden)"
+    },
+    "/creditTransfers/{transferId}": {
+      "schema": "CreditTransfer",
+      "description": "Atomic two-phase credit transfer records readable only by sender or recipient"
+    }
+  }
+}
