@@ -18,9 +18,14 @@ import { NativeBannerAd } from './AdSlots';
 interface AboutContactPageProps {
   onNavigate: (view: AppView) => void;
   userEmail?: string;
+  isSignedIn?: boolean;
 }
 
-export const AboutContactPage: React.FC<AboutContactPageProps> = ({ onNavigate, userEmail }) => {
+export const AboutContactPage: React.FC<AboutContactPageProps> = ({
+  onNavigate,
+  userEmail,
+  isSignedIn = false,
+}) => {
   const [subject, setSubject] = useState('Support / Help');
   const [email, setEmail] = useState(userEmail || '');
   const [message, setMessage] = useState('');
@@ -71,7 +76,15 @@ export const AboutContactPage: React.FC<AboutContactPageProps> = ({ onNavigate, 
                 <span className="text-base font-mono text-cyan-300">v{GLITCH_AI_VERSION}</span>
               </h1>
               <p className="text-sm text-slate-300 mt-1.5 max-w-2xl leading-relaxed">
-                Glitch AI v{GLITCH_AI_VERSION} was built by <strong className="text-white">Al-Fateh</strong>, a technology organization dedicated to delivering a clean conversational AI with live internet knowledge, natural voice calling, credit-powered image creation, and user-to-user credit transfers — with video generation coming soon in future updates.
+                {isSignedIn ? (
+                  <>
+                    Glitch AI v{GLITCH_AI_VERSION} was built by <strong className="text-white">Al-Fateh</strong>, a technology organization dedicated to delivering a clean conversational AI with live internet knowledge, natural voice calling, credit-powered image creation, and user-to-user credit transfers — with video generation coming soon in future updates.
+                  </>
+                ) : (
+                  <>
+                    Glitch AI v{GLITCH_AI_VERSION} was built by <strong className="text-white">Al-Fateh</strong>, a technology organization dedicated to delivering a clean conversational AI with live internet knowledge, natural voice calling, and real-time multilingual intelligence.
+                  </>
+                )}
               </p>
             </div>
           </div>
@@ -82,7 +95,7 @@ export const AboutContactPage: React.FC<AboutContactPageProps> = ({ onNavigate, 
             <div className="w-8 h-8 rounded-lg bg-cyan-500/15 text-cyan-400 flex items-center justify-center mb-3">
               <Zap className="w-4 h-4" />
             </div>
-            <h3 className="text-sm font-semibold text-white mb-1.5">Precision & Speed</h3>
+            <h3 className="text-sm font-semibold text-white mb-1.5">Precision &amp; Speed</h3>
             <p className="text-xs text-slate-400 leading-relaxed">
               Engineered by Al-Fateh for razor-sharp coding, research analysis, creative direction, and effortless everyday productivity.
             </p>
@@ -92,9 +105,13 @@ export const AboutContactPage: React.FC<AboutContactPageProps> = ({ onNavigate, 
             <div className="w-8 h-8 rounded-lg bg-fuchsia-500/15 text-fuchsia-400 flex items-center justify-center mb-3">
               <Sparkles className="w-4 h-4" />
             </div>
-            <h3 className="text-sm font-semibold text-white mb-1.5">Multimodal Workspace</h3>
+            <h3 className="text-sm font-semibold text-white mb-1.5">
+              {isSignedIn ? 'Multimodal Workspace' : 'Conversational & Voice'}
+            </h3>
             <p className="text-xs text-slate-400 leading-relaxed">
-              Combines deep reasoning, visual understanding, expressive voice calls, and credit-powered image generation — with video synthesis coming soon.
+              {isSignedIn
+                ? 'Combines deep reasoning, visual understanding, expressive voice calls, and credit-powered image generation — with video synthesis coming soon.'
+                : 'Combines deep reasoning, live internet grounding, and expressive multilingual voice calling in a fast, uncluttered workspace.'}
             </p>
           </div>
 
@@ -102,9 +119,13 @@ export const AboutContactPage: React.FC<AboutContactPageProps> = ({ onNavigate, 
             <div className="w-8 h-8 rounded-lg bg-indigo-500/15 text-indigo-400 flex items-center justify-center mb-3">
               <Shield className="w-4 h-4" />
             </div>
-            <h3 className="text-sm font-semibold text-white mb-1.5">Credits &amp; Security</h3>
+            <h3 className="text-sm font-semibold text-white mb-1.5">
+              {isSignedIn ? 'Credits & Security' : 'Reliability & Security'}
+            </h3>
             <p className="text-xs text-slate-400 leading-relaxed">
-              Start with 100 Credits, win lucky 0–10 Credit ad rewards, transfer Credits directly to friends, and export any conversation to PDF.
+              {isSignedIn
+                ? 'Start with 100 Credits, get lucky 0–10 Credit ad rewards, transfer Credits directly to friends, and export any conversation to PDF.'
+                : 'Built for secure, reliable access across devices with instant PDF export and strict privacy protection.'}
             </p>
           </div>
         </div>

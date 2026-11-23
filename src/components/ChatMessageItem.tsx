@@ -14,7 +14,7 @@ import {
   Coins,
 } from 'lucide-react';
 import { ChatMessage, UserProfile } from '../types';
-import { apiUrl } from '../lib/api';
+import { apiFetch } from '../lib/api';
 import { GLITCH_EMBLEM_SRC } from '../lib/assets';
 import { MarkdownRenderer } from './MarkdownRenderer';
 
@@ -102,7 +102,7 @@ export const ChatMessageItem: React.FC<ChatMessageItemProps> = ({
     } catch {}
 
     try {
-      const res = await fetch(apiUrl('/api/tts'), {
+      const res = await apiFetch('/api/tts', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -171,7 +171,7 @@ export const ChatMessageItem: React.FC<ChatMessageItemProps> = ({
           {/* Avatar */}
           <div className="flex-shrink-0 pt-0.5">
             {isUser ? (
-              userProfile?.customAvatar ? (
+              isSignedIn && userProfile?.customAvatar ? (
                 <img
                   src={userProfile.customAvatar}
                   alt="User"
@@ -180,7 +180,7 @@ export const ChatMessageItem: React.FC<ChatMessageItemProps> = ({
               ) : (
                 <div
                   className={`w-8 h-8 rounded-lg border flex items-center justify-center shadow-sm ${getUserAvatarColorClass(
-                    userProfile?.avatarColor
+                    isSignedIn ? userProfile?.avatarColor : 'cyan'
                   )}`}
                 >
                   <User className="w-4 h-4" />
@@ -210,7 +210,7 @@ export const ChatMessageItem: React.FC<ChatMessageItemProps> = ({
             {/* Header info */}
             <div className="flex items-center gap-2 mb-1.5">
               <span className="text-xs font-semibold tracking-wide text-slate-200">
-                {isUser ? userProfile?.name || 'You' : 'Glitch AI'}
+                {isUser ? (isSignedIn ? userProfile?.name || 'You' : 'You') : 'Glitch AI'}
               </span>
               <span className="text-[11px] font-mono tabular-nums text-slate-500">
                 {formatTime(message.timestamp)}
@@ -347,7 +347,7 @@ export const ChatMessageItem: React.FC<ChatMessageItemProps> = ({
                     <MarkdownRenderer content={message.content} />
                     {!isSignedIn &&
                       onGoogleSignIn &&
-                      message.content.includes('Sign In Required for Image Generation') && (
+                      message.content.includes('Sign In Required') && (
                         <div className="pt-1">
                           <button
                             type="button"
@@ -355,11 +355,11 @@ export const ChatMessageItem: React.FC<ChatMessageItemProps> = ({
                             className="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-xl glitch-btn-primary text-xs font-semibold cursor-pointer"
                           >
                             <User className="w-3.5 h-3.5" />
-                            <span>Sign in with Google to Generate Images</span>
+                            <span>Sign in with Google</span>
                           </button>
                         </div>
                       )}
-                    {onOpenCredits && message.content.includes('Insufficient Credit Balance') && (
+                    {isSignedIn && onOpenCredits && message.content.includes('Insufficient Credit Balance') && (
                       <div className="pt-1">
                         <button
                           type="button"
@@ -367,7 +367,7 @@ export const ChatMessageItem: React.FC<ChatMessageItemProps> = ({
                           className="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-xl glitch-btn-primary text-xs font-semibold cursor-pointer"
                         >
                           <Coins className="w-3.5 h-3.5" />
-                          <span>Watch Ad (Win 0–10 Credits)</span>
+                          <span>Watch Ad (Get 0–10 Credits)</span>
                         </button>
                       </div>
                     )}

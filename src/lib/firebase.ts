@@ -3,6 +3,8 @@ import {
   getAuth,
   GoogleAuthProvider,
   signInWithPopup,
+  signInWithRedirect,
+  getRedirectResult,
   signOut,
   onAuthStateChanged,
   User as FirebaseUser,
@@ -42,6 +44,14 @@ export const db = getFirestore(app, firebaseConfig.firestoreDatabaseId);
 export const auth = getAuth(app);
 export const googleProvider = new GoogleAuthProvider();
 googleProvider.setCustomParameters({ prompt: 'select_account' });
+
+if (typeof window !== 'undefined' && (window.location.protocol === 'http:' || window.location.protocol === 'https:')) {
+  getRedirectResult(auth).catch((err) => {
+    if (err?.code && err.code !== 'auth/no-auth-event') {
+      console.warn('[Firebase Auth] Redirect result note:', err.code);
+    }
+  });
+}
 
 async function testConnection() {
   try {
@@ -102,14 +112,14 @@ export function handleFirestoreError(error: unknown, operationType: OperationTyp
   throw new Error(JSON.stringify(errInfo));
 }
 
-export async function signInWithGoogle(): Promise<FirebaseUser> {
+export async function signInWithGoogle(): Promise<FirebaseUser | null> {
   if (
     typeof window !== 'undefined' &&
     window.location.protocol !== 'http:' &&
     window.location.protocol !== 'https:'
   ) {
     const err: any = new Error(
-      'Google Sign-In requires hosting over http:// or https:// (such as your custom domain).'
+      'Google Sign-In requires hosting over http:// or https:// (such as https://the-glitch-ai.netlify.app/).'
     );
     err.code = 'auth/operation-not-supported-in-this-environment';
     throw err;
@@ -118,6 +128,10 @@ export async function signInWithGoogle(): Promise<FirebaseUser> {
     const result = await signInWithPopup(auth, googleProvider);
     return result.user;
   } catch (err: any) {
+    if (err?.code === 'auth/popup-blocked' || err?.code === 'auth/cancelled-popup-request') {
+      await signInWithRedirect(auth, googleProvider);
+      return null;
+    }
     console.error('Google Sign-In failed:', err);
     throw err;
   }

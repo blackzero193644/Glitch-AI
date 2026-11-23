@@ -17,6 +17,7 @@ import { AD_REWARD_MAX, GLITCH_AI_VERSION, IMAGE_CREDIT_COST, INITIAL_CREDITS } 
 interface GuidesPageProps {
   onNavigate: (view: AppView) => void;
   onSelectPrompt: (promptText: string, mode?: 'chat' | 'image' | 'video') => void;
+  isSignedIn?: boolean;
 }
 
 interface GuideItem {
@@ -81,7 +82,7 @@ const GUIDES_LIST: GuideItem[] = [
     prompt:
       'A minimalist timber and glass mountain cabin overlooking a misty pine fjord at sunrise, warm interior lights, 8k photorealistic architectural photography.',
     explanation:
-      'Describe lighting, lens mood, and subject details directly in Image mode — Glitch AI handles composition automatically.',
+      'Describe lighting, lens mood, and subject details directly in your prompt — Glitch AI handles composition automatically.',
     recommendedMode: 'Image',
     mode: 'image',
   },
@@ -92,7 +93,7 @@ const GUIDES_LIST: GuideItem[] = [
     prompt:
       'A glowing bioluminescent redwood forest at twilight with crystal streams and soft volumetric light beams, 8k photorealistic.',
     explanation:
-      `Generates a high-resolution visual in Image Mode (${IMAGE_CREDIT_COST} Credits per image). Video generation is Coming Soon.`,
+      'Generates a high-resolution visual directly from your prompt. Video generation is Coming Soon.',
     recommendedMode: 'Image',
     mode: 'image',
   },
@@ -120,12 +121,17 @@ const GUIDES_LIST: GuideItem[] = [
   },
 ];
 
-export const GuidesPage: React.FC<GuidesPageProps> = ({ onNavigate, onSelectPrompt }) => {
+export const GuidesPage: React.FC<GuidesPageProps> = ({
+  onNavigate,
+  onSelectPrompt,
+  isSignedIn = false,
+}) => {
   const [filter, setFilter] = useState<'all' | 'research' | 'code' | 'media' | 'productivity'>('all');
   const [copiedId, setCopiedId] = useState<string | null>(null);
   const [search, setSearch] = useState('');
 
   const filteredGuides = GUIDES_LIST.filter((g) => {
+    if (!isSignedIn && g.mode === 'image') return false;
     const matchesFilter = filter === 'all' || g.category === filter;
     const matchesSearch =
       g.title.toLowerCase().includes(search.toLowerCase()) ||
@@ -161,31 +167,23 @@ export const GuidesPage: React.FC<GuidesPageProps> = ({ onNavigate, onSelectProm
             <span>Using Glitch AI</span>
           </div>
           <h1 className="text-3xl sm:text-4xl font-extrabold text-white tracking-tight font-display">
-            Guides & Tips <span className="text-lg font-mono text-cyan-400">v{GLITCH_AI_VERSION}</span>
+            Guides &amp; Tips <span className="text-lg font-mono text-cyan-400">v{GLITCH_AI_VERSION}</span>
           </h1>
           <p className="text-sm text-slate-300 leading-relaxed">
-            Explore prompts for research, coding, credit-powered image creation, and voice workflows.
+            {isSignedIn
+              ? 'Explore prompts for research, coding, credit-powered image creation, and voice workflows.'
+              : 'Explore prompts for live internet research, coding solutions, strategy, and voice workflows.'}
           </p>
         </div>
 
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3.5">
+        <div className={`grid grid-cols-1 sm:grid-cols-2 ${isSignedIn ? 'lg:grid-cols-4' : 'lg:grid-cols-2'} gap-3.5`}>
           <div className="p-4 rounded-xl bg-[#090c1a] border border-[#192241] text-left">
             <div className="w-8 h-8 rounded-lg bg-cyan-500/15 text-cyan-400 flex items-center justify-center mb-2.5">
               <Sliders className="w-4 h-4" />
             </div>
-            <h3 className="text-xs font-bold text-white mb-1">1. Switch Modes in Chat</h3>
+            <h3 className="text-xs font-bold text-white mb-1">1. Natural Prompt Detection</h3>
             <p className="text-[11px] text-slate-400 leading-relaxed">
-              Toggle between <strong>Chat</strong> and <strong>Image</strong> right above the chat box — Video Generation is Coming Soon.
-            </p>
-          </div>
-
-          <div className="p-4 rounded-xl bg-[#090c1a] border border-[#192241] text-left">
-            <div className="w-8 h-8 rounded-lg bg-indigo-500/15 text-indigo-400 flex items-center justify-center mb-2.5">
-              <User className="w-4 h-4" />
-            </div>
-            <h3 className="text-xs font-bold text-white mb-1">2. Custom Instructions</h3>
-            <p className="text-[11px] text-slate-400 leading-relaxed">
-              Open your Profile to set your name, role, and preferences so Glitch AI tailors every reply to you.
+              Just type naturally in any language — Glitch AI automatically searches live web sources when needed.
             </p>
           </div>
 
@@ -193,21 +191,35 @@ export const GuidesPage: React.FC<GuidesPageProps> = ({ onNavigate, onSelectProm
             <div className="w-8 h-8 rounded-lg bg-emerald-500/15 text-emerald-400 flex items-center justify-center mb-2.5">
               <Zap className="w-4 h-4" />
             </div>
-            <h3 className="text-xs font-bold text-white mb-1">3. Live Voice & Voices</h3>
+            <h3 className="text-xs font-bold text-white mb-1">2. Live Voice &amp; Voices</h3>
             <p className="text-[11px] text-slate-400 leading-relaxed">
               Start a Voice Call anytime. Glitch AI understands your spoken language automatically and lets you preview or rename voices.
             </p>
           </div>
 
-          <div className="p-4 rounded-xl bg-[#090c1a] border border-[#192241] text-left">
-            <div className="w-8 h-8 rounded-lg bg-fuchsia-500/15 text-fuchsia-400 flex items-center justify-center mb-2.5">
-              <Sparkles className="w-4 h-4" />
-            </div>
-            <h3 className="text-xs font-bold text-white mb-1">4. {INITIAL_CREDITS} Credits &amp; Transfers</h3>
-            <p className="text-[11px] text-slate-400 leading-relaxed">
-              Start with {INITIAL_CREDITS} Credits ({IMAGE_CREDIT_COST} per image), win 0–{AD_REWARD_MAX} Credits per ad, or send Credits to friends.
-            </p>
-          </div>
+          {isSignedIn && (
+            <>
+              <div className="p-4 rounded-xl bg-[#090c1a] border border-[#192241] text-left">
+                <div className="w-8 h-8 rounded-lg bg-indigo-500/15 text-indigo-400 flex items-center justify-center mb-2.5">
+                  <User className="w-4 h-4" />
+                </div>
+                <h3 className="text-xs font-bold text-white mb-1">3. Custom Instructions</h3>
+                <p className="text-[11px] text-slate-400 leading-relaxed">
+                  Open your Profile to set your name, role, and preferences so Glitch AI tailors every reply to you.
+                </p>
+              </div>
+
+              <div className="p-4 rounded-xl bg-[#090c1a] border border-[#192241] text-left">
+                <div className="w-8 h-8 rounded-lg bg-fuchsia-500/15 text-fuchsia-400 flex items-center justify-center mb-2.5">
+                  <Sparkles className="w-4 h-4" />
+                </div>
+                <h3 className="text-xs font-bold text-white mb-1">4. {INITIAL_CREDITS} Credits &amp; Transfers</h3>
+                <p className="text-[11px] text-slate-400 leading-relaxed">
+                  Start with {INITIAL_CREDITS} Credits ({IMAGE_CREDIT_COST} per image), get 0–{AD_REWARD_MAX} Credits per ad, or send Credits to friends.
+                </p>
+              </div>
+            </>
+          )}
         </div>
 
         <div className="flex flex-col sm:flex-row items-center justify-between gap-3 pt-4 border-t border-[#192241]">

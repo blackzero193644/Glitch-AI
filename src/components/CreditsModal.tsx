@@ -207,7 +207,7 @@ export const CreditsModal: React.FC<CreditsModalProps> = ({
         <div className="mb-4 pr-8">
           <h3 className="text-lg font-bold text-white tracking-tight">Credits &amp; Transfers</h3>
           <p className="text-xs text-slate-400">
-            Glitch AI v{GLITCH_AI_VERSION} · Win 0–{AD_REWARD_MAX} Credits per ad
+            Glitch AI v{GLITCH_AI_VERSION} · Get 0–{AD_REWARD_MAX} Credits per ad
           </p>
         </div>
 
@@ -267,7 +267,7 @@ export const CreditsModal: React.FC<CreditsModalProps> = ({
             <div>
               <div className="text-sm font-semibold text-white">Lucky Ad Reward (0–{AD_REWARD_MAX} Credits)</div>
               <p className="text-xs text-slate-400 mt-0.5 leading-relaxed">
-                Open the sponsored ad page for {AD_WATCH_SECONDS} seconds to win a random luck-based reward between{' '}
+                Open the sponsored ad page for {AD_WATCH_SECONDS} seconds to get a random luck-based reward between{' '}
                 <span className="text-cyan-300 font-semibold">0 and {AD_REWARD_MAX} Credits</span>. Rarely you may roll 0 — watch another ad anytime to try again!
               </p>
             </div>
@@ -328,8 +328,8 @@ export const CreditsModal: React.FC<CreditsModalProps> = ({
                 {adState === 'watching'
                   ? `Verifying View (${secondsLeft}s)...`
                   : adState === 'claimed'
-                  ? `Watch Another Ad (Win 0–${AD_REWARD_MAX})`
-                  : `Watch Ad (Win 0–${AD_REWARD_MAX} Credits)`}
+                  ? `Watch Another Ad (Get 0–${AD_REWARD_MAX})`
+                  : `Watch Ad (Get 0–${AD_REWARD_MAX} Credits)`}
               </span>
               <ExternalLink className="w-3.5 h-3.5 opacity-80" />
             </a>

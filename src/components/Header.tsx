@@ -183,16 +183,18 @@ export const Header: React.FC<HeaderProps> = ({
           </button>
         )}
 
-        <button
-          type="button"
-          onClick={onOpenCredits}
-          className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-xl bg-[#090d1e] border border-[#1d284b] hover:border-cyan-500/60 text-slate-200 text-xs font-mono tabular-nums transition-all cursor-pointer whitespace-nowrap shrink-0"
-          title="Credit Balance, Lucky Rewards (0–10) & Transfers"
-        >
-          <Coins className={`w-3.5 h-3.5 ${credits <= 5 ? 'text-rose-400' : 'text-cyan-400'}`} />
-          <span>{credits}</span>
-          <span className="hidden sm:inline text-cyan-400 font-sans text-[11px] font-semibold">+ Earn</span>
-        </button>
+        {isSignedIn && (
+          <button
+            type="button"
+            onClick={onOpenCredits}
+            className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-xl bg-[#090d1e] border border-[#1d284b] hover:border-cyan-500/60 text-slate-200 text-xs font-mono tabular-nums transition-all cursor-pointer whitespace-nowrap shrink-0"
+            title="Credit Balance, Lucky Rewards (0–10) & Transfers"
+          >
+            <Coins className={`w-3.5 h-3.5 ${credits <= 5 ? 'text-rose-400' : 'text-cyan-400'}`} />
+            <span>{credits}</span>
+            <span className="hidden sm:inline text-cyan-400 font-sans text-[11px] font-semibold">+ Earn</span>
+          </button>
+        )}
 
         {!isSignedIn && (
           <button
@@ -205,30 +207,32 @@ export const Header: React.FC<HeaderProps> = ({
           </button>
         )}
 
-        <button
-          onClick={onOpenProfile}
-          className="flex items-center gap-2 py-1 px-2 sm:px-2.5 rounded-xl bg-[#090d1e] border border-[#1d284b] hover:border-cyan-500/60 text-slate-200 hover:text-white transition-all cursor-pointer shrink-0"
-          title="Manage Profile, Device Avatar & Settings"
-        >
-          {userProfile.customAvatar ? (
-            <img
-              src={userProfile.customAvatar}
-              alt="Avatar"
-              className="w-5 h-5 rounded-md object-cover border border-cyan-400"
-            />
-          ) : (
-            <div
-              className={`w-5 h-5 rounded-md ${getAvatarBg(
-                userProfile.avatarColor
-              )} border flex items-center justify-center text-white text-[10px]`}
-            >
-              <User className="w-3 h-3" />
-            </div>
-          )}
-          <span className="text-xs font-medium max-w-[90px] sm:max-w-[120px] truncate">
-            {userProfile.name || 'Set Name'}
-          </span>
-        </button>
+        {isSignedIn && (
+          <button
+            onClick={onOpenProfile}
+            className="flex items-center gap-2 py-1 px-2 sm:px-2.5 rounded-xl bg-[#090d1e] border border-[#1d284b] hover:border-cyan-500/60 text-slate-200 hover:text-white transition-all cursor-pointer shrink-0"
+            title="Manage Profile, Device Avatar & Settings"
+          >
+            {userProfile.customAvatar ? (
+              <img
+                src={userProfile.customAvatar}
+                alt="Avatar"
+                className="w-5 h-5 rounded-md object-cover border border-cyan-400"
+              />
+            ) : (
+              <div
+                className={`w-5 h-5 rounded-md ${getAvatarBg(
+                  userProfile.avatarColor
+                )} border flex items-center justify-center text-white text-[10px]`}
+              >
+                <User className="w-3 h-3" />
+              </div>
+            )}
+            <span className="text-xs font-medium max-w-[90px] sm:max-w-[120px] truncate">
+              {userProfile.name || 'Set Name'}
+            </span>
+          </button>
+        )}
       </div>
     </header>
   );

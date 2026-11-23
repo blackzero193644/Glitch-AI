@@ -1,6 +1,8 @@
 node_modules/
 build/
 dist/
+dist-standalone/
+.netlify/
 coverage/
 .DS_Store
 *.log

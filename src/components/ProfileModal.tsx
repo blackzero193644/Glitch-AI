@@ -241,7 +241,7 @@ export const ProfileModal: React.FC<ProfileModalProps> = ({
               className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg glitch-btn-primary text-xs font-semibold cursor-pointer"
             >
               <PlayCircle className="w-3.5 h-3.5" />
-              <span>Watch Ad (Win 0–{AD_REWARD_MAX})</span>
+              <span>Watch Ad (Get 0–{AD_REWARD_MAX})</span>
             </button>
           </div>
         </div>

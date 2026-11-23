@@ -16,7 +16,7 @@ import {
   X,
 } from 'lucide-react';
 import { GlitchVoiceId, UserProfile, VoiceOption } from '../types';
-import { apiUrl } from '../lib/api';
+import { apiFetch } from '../lib/api';
 import { GLITCH_EMBLEM_SRC } from '../lib/assets';
 
 interface VoiceCallModalProps {
@@ -185,7 +185,7 @@ export const VoiceCallModal: React.FC<VoiceCallModalProps> = ({
   useEffect(() => {
     if (!isOpen) return;
     let cancelled = false;
-    fetch(apiUrl('/api/voices'))
+    apiFetch('/api/voices')
       .then((r) => (r.ok ? r.json() : null))
       .then((data) => {
         if (!cancelled && Array.isArray(data?.voices) && data.voices.length > 0) {
@@ -455,7 +455,7 @@ export const VoiceCallModal: React.FC<VoiceCallModalProps> = ({
         turnAbortRef.current = abortController;
 
         try {
-          const callRes = await fetch(apiUrl('/api/call-audio'), {
+          const callRes = await apiFetch('/api/call-audio', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({
@@ -943,7 +943,7 @@ export const VoiceCallModal: React.FC<VoiceCallModalProps> = ({
     turnAbortRef.current = abortController;
 
     try {
-      const res = await fetch(apiUrl('/api/call'), {
+      const res = await apiFetch('/api/call', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -1006,7 +1006,7 @@ export const VoiceCallModal: React.FC<VoiceCallModalProps> = ({
     setPreviewingVoiceId(v.id);
     try {
       const displayName = getVoiceDisplayName(v);
-      const res = await fetch(apiUrl('/api/tts'), {
+      const res = await apiFetch('/api/tts', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({

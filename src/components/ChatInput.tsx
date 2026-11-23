@@ -19,6 +19,7 @@ interface ChatInputProps {
   isStreaming: boolean;
   onStopStreaming: () => void;
   inputRef?: React.RefObject<HTMLTextAreaElement | null>;
+  isSignedIn?: boolean;
 }
 
 export const ChatInput: React.FC<ChatInputProps> = ({
@@ -26,6 +27,7 @@ export const ChatInput: React.FC<ChatInputProps> = ({
   isStreaming,
   onStopStreaming,
   inputRef: externalInputRef,
+  isSignedIn = false,
 }) => {
   const [text, setText] = useState('');
   const [attachedImage, setAttachedImage] = useState<string | null>(null);
@@ -35,6 +37,12 @@ export const ChatInput: React.FC<ChatInputProps> = ({
   const textareaRef = externalInputRef || localInputRef;
   const imageInputRef = useRef<HTMLInputElement>(null);
   const recognitionRef = useRef<any>(null);
+
+  useEffect(() => {
+    if (!isSignedIn && attachedImage) {
+      setAttachedImage(null);
+    }
+  }, [isSignedIn, attachedImage]);
 
   useEffect(() => {
     const textarea = textareaRef.current;
@@ -121,6 +129,7 @@ export const ChatInput: React.FC<ChatInputProps> = ({
   };
 
   const handleImageSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (!isSignedIn) return;
     const file = e.target.files?.[0];
     if (file) {
       compressImageFile(file);
@@ -129,6 +138,7 @@ export const ChatInput: React.FC<ChatInputProps> = ({
   };
 
   const handlePaste = (e: React.ClipboardEvent<HTMLTextAreaElement>) => {
+    if (!isSignedIn) return;
     const items = e.clipboardData?.items;
     if (!items) return;
     for (const item of Array.from(items)) {
@@ -151,9 +161,9 @@ export const ChatInput: React.FC<ChatInputProps> = ({
   };
 
   const handleSubmit = () => {
-    if ((!text.trim() && !attachedImage) || isStreaming) return;
+    if ((!text.trim() && !(isSignedIn && attachedImage)) || isStreaming) return;
     onSendMessage(text.trim() || 'Analyze this image.', {
-      imageUrl: attachedImage || undefined,
+      imageUrl: isSignedIn && attachedImage ? attachedImage : undefined,
     });
     setText('');
     setAttachedImage(null);
@@ -166,7 +176,7 @@ export const ChatInput: React.FC<ChatInputProps> = ({
     <div className="w-full max-w-4xl mx-auto px-4 pb-3 pt-1">
       {/* Main Input Box — completely clean, prompt-driven */}
       <div className="relative rounded-2xl bg-[#090d1e] border border-[#1a2444] focus-within:border-cyan-500/70 focus-within:ring-1 focus-within:ring-cyan-500/25 transition-all shadow-xl shadow-black/40">
-        {attachedImage && (
+        {isSignedIn && attachedImage && (
           <div className="px-3.5 pt-3 pb-1 flex items-center gap-3">
             <div className="relative group">
               <img
@@ -195,32 +205,42 @@ export const ChatInput: React.FC<ChatInputProps> = ({
           onChange={(e) => setText(e.target.value)}
           onKeyDown={handleKeyDown}
           onPaste={handlePaste}
-          placeholder="Message Glitch AI or ask to create an image..."
+          placeholder={
+            isSignedIn
+              ? 'Message Glitch AI or ask to create an image...'
+              : 'Message Glitch AI...'
+          }
           rows={1}
-          className="w-full bg-transparent text-slate-100 placeholder-slate-500 px-4 py-3.5 pr-32 resize-none focus:outline-none text-[15px] leading-relaxed max-h-[180px]"
+          className={`w-full bg-transparent text-slate-100 placeholder-slate-500 px-4 py-3.5 resize-none focus:outline-none text-[15px] leading-relaxed max-h-[180px] ${
+            isSignedIn ? 'pr-32' : 'pr-24'
+          }`}
         />
 
         {/* Right side controls inside textarea */}
         <div className="absolute right-2.5 bottom-2.5 flex items-center gap-1">
-          <input
-            type="file"
-            ref={imageInputRef}
-            onChange={handleImageSelect}
-            accept="image/*"
-            className="hidden"
-          />
-          <button
-            type="button"
-            onClick={() => imageInputRef.current?.click()}
-            className={`p-2 rounded-xl transition-all cursor-pointer ${
-              attachedImage
-                ? 'bg-cyan-500/20 text-cyan-300 border border-cyan-500/40'
-                : 'text-slate-400 hover:text-white hover:bg-[#131a36]'
-            }`}
-            title="Attach an image"
-          >
-            <ImagePlus className="w-4 h-4" />
-          </button>
+          {isSignedIn && (
+            <>
+              <input
+                type="file"
+                ref={imageInputRef}
+                onChange={handleImageSelect}
+                accept="image/*"
+                className="hidden"
+              />
+              <button
+                type="button"
+                onClick={() => imageInputRef.current?.click()}
+                className={`p-2 rounded-xl transition-all cursor-pointer ${
+                  attachedImage
+                    ? 'bg-cyan-500/20 text-cyan-300 border border-cyan-500/40'
+                    : 'text-slate-400 hover:text-white hover:bg-[#131a36]'
+                }`}
+                title="Attach an image"
+              >
+                <ImagePlus className="w-4 h-4" />
+              </button>
+            </>
+          )}
 
           <button
             type="button"

@@ -55,7 +55,9 @@ export const HomePage: React.FC<HomePageProps> = ({
         </h1>
 
         <p className="text-sm sm:text-base text-slate-400 max-w-xl mx-auto mb-8 leading-relaxed">
-          Chat with live internet knowledge, generate high-resolution images with Credits, send Credits to friends, and talk naturally over live voice calls.
+          {isSignedIn
+            ? 'Chat with live internet knowledge, generate high-resolution images with Credits, send Credits to friends, and talk naturally over live voice calls.'
+            : 'Chat with live internet knowledge, get clear coding and research answers, and talk naturally over live voice calls.'}
         </p>
 
         {/* Primary Actions */}
@@ -79,13 +81,13 @@ export const HomePage: React.FC<HomePageProps> = ({
             </button>
           )}
 
-          {onOpenCredits && (
+          {isSignedIn && onOpenCredits && (
             <button
               onClick={onOpenCredits}
               className="flex items-center gap-2 px-5 py-3 rounded-xl bg-[#090c1a] hover:bg-[#10162f] border border-[#1d284b] text-cyan-300 font-semibold text-sm transition-all cursor-pointer"
             >
               <Coins className="w-4 h-4 text-cyan-400" />
-              <span>Win 0–{AD_REWARD_MAX} Credits</span>
+              <span>Get 0–{AD_REWARD_MAX} Credits</span>
             </button>
           )}
 
@@ -107,31 +109,57 @@ export const HomePage: React.FC<HomePageProps> = ({
             <div className="w-10 h-10 rounded-xl bg-cyan-500/15 border border-cyan-500/30 flex items-center justify-center text-cyan-400 mb-4">
               <MessageSquare className="w-5 h-5" />
             </div>
-            <h3 className="text-base font-semibold text-white mb-2">Smart Chat & Voice</h3>
+            <h3 className="text-base font-semibold text-white mb-2">Smart Chat &amp; Live Web</h3>
             <p className="text-xs text-slate-400 leading-relaxed">
-              Clear answers, coding help, visual analysis, and multilingual voice calling inside one calm workspace.
+              Deep reasoning, clean code solutions, real-time global web facts, and multilingual accuracy in one workspace.
             </p>
           </div>
 
-          <div className="p-6 rounded-2xl bg-[#090c1a] border border-[#192241]">
-            <div className="w-10 h-10 rounded-xl bg-fuchsia-500/15 border border-fuchsia-500/30 flex items-center justify-center text-fuchsia-400 mb-4">
-              <ImageIcon className="w-5 h-5" />
-            </div>
-            <h3 className="text-base font-semibold text-white mb-2">Credit Image Studio</h3>
-            <p className="text-xs text-slate-400 leading-relaxed">
-              Create images for {IMAGE_CREDIT_COST} Credits each and watch ads to win a lucky 0–{AD_REWARD_MAX} Credits anytime. Video creation is coming soon.
-            </p>
-          </div>
+          {isSignedIn ? (
+            <>
+              <div className="p-6 rounded-2xl bg-[#090c1a] border border-[#192241]">
+                <div className="w-10 h-10 rounded-xl bg-fuchsia-500/15 border border-fuchsia-500/30 flex items-center justify-center text-fuchsia-400 mb-4">
+                  <ImageIcon className="w-5 h-5" />
+                </div>
+                <h3 className="text-base font-semibold text-white mb-2">Credit Image Studio</h3>
+                <p className="text-xs text-slate-400 leading-relaxed">
+                  Create images for {IMAGE_CREDIT_COST} Credits each and watch ads to get a lucky 0–{AD_REWARD_MAX} Credits anytime. Video creation is coming soon.
+                </p>
+              </div>
 
-          <div className="p-6 rounded-2xl bg-[#090c1a] border border-[#192241]">
-            <div className="w-10 h-10 rounded-xl bg-indigo-500/15 border border-indigo-500/30 flex items-center justify-center text-indigo-400 mb-4">
-              <Send className="w-5 h-5" />
-            </div>
-            <h3 className="text-base font-semibold text-white mb-2">Credit Transfers &amp; PDF</h3>
-            <p className="text-xs text-slate-400 leading-relaxed">
-              Transfer Credits directly to another user by email or Account ID, and export any conversation as a PDF document.
-            </p>
-          </div>
+              <div className="p-6 rounded-2xl bg-[#090c1a] border border-[#192241]">
+                <div className="w-10 h-10 rounded-xl bg-indigo-500/15 border border-indigo-500/30 flex items-center justify-center text-indigo-400 mb-4">
+                  <Send className="w-5 h-5" />
+                </div>
+                <h3 className="text-base font-semibold text-white mb-2">Credit Transfers &amp; PDF</h3>
+                <p className="text-xs text-slate-400 leading-relaxed">
+                  Transfer Credits directly to another user by email or Account ID, and export any conversation as a PDF document.
+                </p>
+              </div>
+            </>
+          ) : (
+            <>
+              <div className="p-6 rounded-2xl bg-[#090c1a] border border-[#192241]">
+                <div className="w-10 h-10 rounded-xl bg-fuchsia-500/15 border border-fuchsia-500/30 flex items-center justify-center text-fuchsia-400 mb-4">
+                  <Phone className="w-5 h-5" />
+                </div>
+                <h3 className="text-base font-semibold text-white mb-2">Live Voice Call</h3>
+                <p className="text-xs text-slate-400 leading-relaxed">
+                  Speak naturally in your preferred language with low-latency responses and studio-grade voices anytime.
+                </p>
+              </div>
+
+              <div className="p-6 rounded-2xl bg-[#090c1a] border border-[#192241]">
+                <div className="w-10 h-10 rounded-xl bg-indigo-500/15 border border-indigo-500/30 flex items-center justify-center text-indigo-400 mb-4">
+                  <Send className="w-5 h-5" />
+                </div>
+                <h3 className="text-base font-semibold text-white mb-2">Instant PDF Export</h3>
+                <p className="text-xs text-slate-400 leading-relaxed">
+                  Save any research session, code solution, or study notes as a cleanly formatted PDF document in one click.
+                </p>
+              </div>
+            </>
+          )}
         </div>
       </div>
 

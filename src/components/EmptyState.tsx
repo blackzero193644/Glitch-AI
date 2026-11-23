@@ -7,12 +7,14 @@ interface EmptyStateProps {
   onOpenVoiceCall?: () => void;
   onOpenCredits?: () => void;
   credits?: number;
+  isSignedIn?: boolean;
 }
 
 export const EmptyState: React.FC<EmptyStateProps> = ({
   onOpenVoiceCall,
   onOpenCredits,
   credits = 100,
+  isSignedIn = false,
 }) => {
   return (
     <div className="flex-1 flex flex-col items-center justify-center px-6 py-10 text-center max-w-xl mx-auto">
@@ -34,7 +36,9 @@ export const EmptyState: React.FC<EmptyStateProps> = ({
       </h1>
 
       <p className="text-slate-400 text-sm sm:text-base leading-relaxed mb-7">
-        Ask anything, create images, or start a live voice call.
+        {isSignedIn
+          ? 'Ask anything, create images, or start a live voice call.'
+          : 'Ask anything or start a live voice call.'}
       </p>
 
       <div className="flex flex-wrap items-center justify-center gap-2.5 text-xs">
@@ -49,14 +53,14 @@ export const EmptyState: React.FC<EmptyStateProps> = ({
           </button>
         )}
 
-        {onOpenCredits && (
+        {isSignedIn && onOpenCredits && (
           <button
             type="button"
             onClick={onOpenCredits}
             className="flex items-center gap-1.5 px-4 py-2 rounded-xl bg-[#090d1f] hover:bg-[#101836] border border-[#1e294b] text-slate-200 font-medium transition-colors cursor-pointer"
           >
             <Coins className="w-3.5 h-3.5 text-cyan-400" />
-            <span>{credits} Credits · Win 0–10</span>
+            <span>{credits} Credits · Get 0–10</span>
           </button>
         )}
       </div>

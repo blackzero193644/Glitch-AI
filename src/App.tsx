@@ -20,7 +20,7 @@ import { AboutContactPage } from './components/AboutContactPage';
 import { LegalPages } from './components/LegalPages';
 import { VoiceCallModal } from './components/VoiceCallModal';
 import { ChatSession, ChatMessage, ChatTone, UserProfile, AppView, CreditTransferRecord } from './types';
-import { apiUrl, isStandaloneBuild } from './lib/api';
+import { apiFetch, isStandaloneBuild } from './lib/api';
 import { tryOfflineKnowledgeFallback } from './lib/offlineFallback';
 import { generateClientImageFallback, trySilentPuterChat } from './lib/puterBridge';
 import {
@@ -122,9 +122,9 @@ function inferExecutionMode(
   }
   const trimmed = text.trim();
 
-  // Never hijack coding / educational questions about images/videos into media generation
+  // Never hijack coding, programming, writing, or theoretical questions into media generation
   const isCodeOrExplainQuery =
-    /^\s*(?:how\s+to|what\s+is|why\s+|explain|write\s+(?:a\s+)?(?:code|script|function|html|css|js|ts|react|python)|fix\s+this|debug)/i.test(
+    /^\s*(?:how\s+to\s+(?:code|build|implement|write)|what\s+is\s+|why\s+|explain\s+|define\s+|(?:write|create|make|build|generate)\s+(?:a|an|me\s+a)?\s*(?:code|script|function|program|html|css|js|ts|react|python|sql|app|website|component|page|plan|table|list|email|essay|summary|resume)|fix\s+this|debug\b|kaise\s+(?:code|kaam|chalta)|kya\s+hai\b|samjhao\b)/i.test(
       trimmed
     );
   if (isCodeOrExplainQuery) {
@@ -133,7 +133,7 @@ function inferExecutionMode(
 
   // Video generation intent (Coming Soon notice)
   if (
-    /\b(?:generate|create|make|render|produce|synthesize|animate)\s+(?:me\s+)?(?:a|an|the)?\s*(?:\w+\s+){0,4}(?:video|animation|clip|movie|film|reel)\b/i.test(
+    /\b(?:generate|create|make|render|produce|synthesize|animate|banao)\s+(?:me\s+)?(?:a|an|the|ek)?\s*(?:\S+\s+){0,5}(?:video|animation|clip|movie|film|reel)\b/i.test(
       trimmed
     ) ||
     (hasImage && /\b(?:animate(?:\s+this)?|turn\s+this\s+into\s+a\s+video|make\s+a\s+video)\b/i.test(trimmed))
@@ -141,18 +141,38 @@ function inferExecutionMode(
     return 'video';
   }
 
-  // Image generation or image editing intent from natural language prompt
+  // Rich multilingual & natural-language image generation / portrait / editing intent
+  const mediaNouns =
+    '(?:image|images|pic|pics|picture|pictures|photo|photos|photograph|portrait|selfie|headshot|logo|logos|illustration|artwork|wallpaper|poster|posters|thumbnail|banner|avatar|pfp|icon|drawing|sketch|painting|caricature|tasveer|tasweer)';
+  const creationVerbs =
+    '(?:generate|create|make|draw|paint|render|design|illustrate|sketch|imagine|visualize|produce|show\\s+me|give\\s+me|get\\s+me|banao|banado|bana\\s+do|dikhao|tayyar\\s+karo)';
+  const imageVerbNounRegex = new RegExp(
+    `\\b${creationVerbs}\\s+(?:me\\s+)?(?:a|an|the|ek|aik)?\\s*(?:\\S+\\s+){0,6}${mediaNouns}\\b`,
+    'i'
+  );
+  const nounThenUrduVerbRegex = new RegExp(
+    `\\b${mediaNouns}\\b[\\s\\S]{0,40}\\b(?:banao|banado|bana\\s+do|chahiye|generate|create)\\b`,
+    'i'
+  );
+  const directVisualNounRegex = new RegExp(
+    `^\\s*(?:an?\\s+)?(?:realistic|photorealistic|hyperrealistic|ultra[-\\s]?realistic|8k|4k|cinematic|anime|3d|cartoon|oil\\s+painting|pencil|watercolor|21:9|16:9|9:16|4:3|3:4|3:2|2:3|4:5|5:4|1:1)?\\s*${mediaNouns}\\s+(?:of|with|showing|featuring|for|in|ki|ka)\\b`,
+    'i'
+  );
+
   if (
-    /\b(?:generate|create|make|draw|paint|render|design|illustrate|sketch|show\s+me)\s+(?:me\s+)?(?:a|an|the)?\s*(?:\w+\s+){0,5}(?:image|picture|photo|photograph|portrait|logo|illustration|artwork|wallpaper|poster|avatar|icon|drawing|painting)\b/i.test(
+    imageVerbNounRegex.test(trimmed) ||
+    nounThenUrduVerbRegex.test(trimmed) ||
+    directVisualNounRegex.test(trimmed) ||
+    /^\s*(?:draw|paint|sketch|illustrate|imagine|render)\s+(?:me\s+)?(?!(?:a\s+)?(?:diagram\s+of\s+how|chart\s+of\s+code))/i.test(
       trimmed
     ) ||
-    /^\s*(?:draw|paint|sketch|illustrate)\s+(?:me\s+)?(?!(?:a\s+)?(?:diagram\s+of\s+how|chart\s+of\s+code))/i.test(
-      trimmed
-    ) ||
-    /^\s*(?:an?\s+)?(?:realistic|photorealistic|8k|4k|cinematic|anime)?\s*(?:image|picture|photo|photograph|portrait|wallpaper|poster|logo)\s+(?:of|for)\b/i.test(
-      trimmed
-    ) ||
-    (hasImage && /\b(?:edit\s+this|reimagine|remix|turn\s+this\s+into|change\s+the\s+background|style\s+this)\b/i.test(trimmed))
+    (trimmed.length < 180 &&
+      /\b(?:21:9|16:9|9:16|4:5|5:4|3:2|2:3)\b/i.test(trimmed) &&
+      new RegExp(`\\b${mediaNouns}|${creationVerbs}\\b`, 'i').test(trimmed)) ||
+    (hasImage &&
+      /\b(?:edit\s+this|reimagine|remix|turn\s+this\s+into|change\s+the\s+background|style\s+this|make\s+this|background\s+change|badal\s+do)\b/i.test(
+        trimmed
+      ))
   ) {
     return 'image';
   }
@@ -165,20 +185,18 @@ function shouldUseLiveSearch(text: string): boolean {
   if (!trimmed) return false;
   if (/https?:\/\/[^\s]+/i.test(trimmed)) return true;
 
-  const isPureGreeting = /^(?:hi|hello|hey|yo|sup|good\s+(?:morning|afternoon|evening)|thanks|thank\s+you|ok|okay|bye)\b[!?.]*$/i.test(
-    trimmed
-  );
-  if (isPureGreeting) return false;
-
-  if (
-    /\b(?:who|what|where|when|which|how\s+(?:much|many|old|far|long|tall|is|are)|tell\s+me\s+about|latest|current|today|now|news|weather|temperature|forecast|price|stock|crypto|bitcoin|btc|eth|ethereum|solana|exchange\s+rate|usd|eur|pkr|inr|gbp|president|prime\s+minister|ceo|capital|population|score|winner|won|release|version|2024|2025|2026|search|lookup|find\s+out)\b/i.test(
+  // Skip purely trivial short conversational greetings/acknowledgments in any script
+  const isPureGreeting =
+    /^(?:hi|hello|hey|yo|sup|helo|good\s+(?:morning|afternoon|evening|night)|thanks|thank\s+you|thx|ok|okay|k|cool|nice|great|bye|goodbye|salam|assalam\s*(?:o|u)?\s*alaikum|wsalam|walikum\s*assalam|shukriya|namaste|hola|bonjour)\b[!?.،۔\s]*$/i.test(
       trimmed
-    )
-  ) {
-    return true;
-  }
+    );
+  if (isPureGreeting || trimmed.length <= 3) return false;
 
-  return trimmed.includes('?') && trimmed.length > 6;
+  // Skip pure code-block paste debugging without a factual web question
+  if (trimmed.startsWith('```') && trimmed.endsWith('```')) return false;
+
+  // Enable real-time live internet grounding broadly across all languages and topics
+  return true;
 }
 
 function persistSessionsSafely(sessions: ChatSession[]) {
@@ -294,7 +312,7 @@ export default function App() {
       setExportNotice('Preparing standalone index.html download...');
 
       try {
-        const res = await fetch('/api/export-standalone', {
+        const res = await apiFetch('/api/export-standalone', {
           method: 'GET',
           headers: { Accept: 'text/html' },
         });
@@ -453,6 +471,8 @@ export default function App() {
         cloudReadyPromiseRef.current = Promise.resolve();
         wasSignedInRef.current = false;
         claimingTxIdsRef.current.clear();
+        setIsProfileOpen(false);
+        setIsCreditsOpen(false);
         setTransferHistory([]);
         setIncomingTransferNotice(null);
         const fresh = createNewSession();
@@ -466,6 +486,8 @@ export default function App() {
         } catch {}
       } else {
         cloudReadyPromiseRef.current = Promise.resolve();
+        setIsProfileOpen(false);
+        setIsCreditsOpen(false);
         setTransferHistory([]);
         setCredits(getGuestCredits());
       }
@@ -602,6 +624,16 @@ export default function App() {
     }
   };
 
+  const handleOpenProfile = () => {
+    if (!currentUser) return;
+    setIsProfileOpen(true);
+  };
+
+  const handleOpenCredits = () => {
+    if (!currentUser) return;
+    setIsCreditsOpen(true);
+  };
+
   const handleGoogleSignIn = async () => {
     setAuthNotice(null);
     try {
@@ -609,7 +641,7 @@ export default function App() {
     } catch (err: any) {
       if (err?.code === 'auth/operation-not-supported-in-this-environment') {
         setAuthNotice(
-          'Google Sign-In requires http:// or https:// (for example, once deployed to your domain). Chat, Voice Call, Ads, and Lucky Credits work locally too.'
+          'Google Sign-In requires http:// or https:// hosting (for example, once deployed to your domain). Chat and Voice Call work anytime.'
         );
       } else if (err?.code === 'auth/unauthorized-domain') {
         const host = typeof window !== 'undefined' ? window.location.hostname : 'this domain';
@@ -624,6 +656,8 @@ export default function App() {
 
   const handleSignOut = async () => {
     try {
+      setIsProfileOpen(false);
+      setIsCreditsOpen(false);
       await logOut();
       setCurrentUser(null);
     } catch (err: any) {
@@ -808,10 +842,13 @@ export default function App() {
     try {
       // 1. VIDEO GENERATION (COMING SOON IN FUTURE VERSION)
       if (effectiveMode === 'video') {
+        const mediaDetail = currentUser
+          ? `Right now, you can continue using **Chat**, **Live Voice Call**, and **Image Generation** (${IMAGE_CREDIT_COST} Credits per image).`
+          : `Right now, you can continue using **Chat** and **Live Voice Call**.`;
         const comingSoonMessage: ChatMessage = {
           id: botMessageId,
           role: 'assistant',
-          content: `**Video Generation is Coming Soon!**\n\nVideo creation is temporarily paused in **Glitch AI v${GLITCH_AI_VERSION}** and will launch in an upcoming version update.\n\nRight now, you can continue using **Chat**, **Live Voice Call**, and **Image Generation** (${IMAGE_CREDIT_COST} Credits per image).`,
+          content: `**Video Generation is Coming Soon!**\n\nVideo creation is temporarily paused in **Glitch AI v${GLITCH_AI_VERSION}** and will launch in an upcoming version update.\n\n${mediaDetail}`,
           timestamp: Date.now(),
           isStreaming: false,
           isGeneratingMedia: false,
@@ -828,7 +865,7 @@ export default function App() {
           const signInRequiredMsg: ChatMessage = {
             id: botMessageId,
             role: 'assistant',
-            content: `**Sign In Required for Image Generation**\n\nPlease sign in with your Google account to create images (**${IMAGE_CREDIT_COST} Credits** per image).`,
+            content: `**Sign In Required**\n\nPlease sign in with your Google account to create or edit images.`,
             timestamp: Date.now(),
             isStreaming: false,
             isGeneratingMedia: false,
@@ -843,7 +880,7 @@ export default function App() {
           const insufficientMessage: ChatMessage = {
             id: botMessageId,
             role: 'assistant',
-            content: `**Insufficient Credit Balance** (**${credits} Credits** remaining).\n\nEach generated image costs **${IMAGE_CREDIT_COST} Credits**. Watch a short ad below to win **0–${AD_REWARD_MAX} Credits**.`,
+            content: `**Insufficient Credit Balance** (**${credits} Credits** remaining).\n\nEach generated image costs **${IMAGE_CREDIT_COST} Credits**. Watch a short ad below to get **0–${AD_REWARD_MAX} Credits**.`,
             timestamp: Date.now(),
             isStreaming: false,
             isGeneratingMedia: false,
@@ -854,7 +891,7 @@ export default function App() {
           return;
         }
 
-        const res = await fetch(apiUrl('/api/generate-image'), {
+        const res = await apiFetch('/api/generate-image', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
@@ -892,7 +929,7 @@ export default function App() {
             const raceInsufficientMsg: ChatMessage = {
               id: botMessageId,
               role: 'assistant',
-              content: `**Insufficient Credit Balance** (**0 Credits** remaining).\n\nEach generated image costs **${IMAGE_CREDIT_COST} Credits**. Watch a short ad below to win **0–${AD_REWARD_MAX} Credits**.`,
+              content: `**Insufficient Credit Balance** (**0 Credits** remaining).\n\nEach generated image costs **${IMAGE_CREDIT_COST} Credits**. Watch a short ad below to get **0–${AD_REWARD_MAX} Credits**.`,
               timestamp: Date.now(),
               isStreaming: false,
               isGeneratingMedia: false,
@@ -932,13 +969,13 @@ export default function App() {
         }));
 
       try {
-        const response = await fetch(apiUrl('/api/chat/stream'), {
+        const response = await apiFetch('/api/chat/stream', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
             messages: sanitizedHistory,
             tone: activeSession.tone,
-            userProfile,
+            userProfile: currentUser ? userProfile : DEFAULT_PROFILE,
             useSearch: autoUseSearch,
             useMaps: options?.useMaps,
           }),
@@ -1112,7 +1149,7 @@ export default function App() {
     y += 76;
 
     activeSession.messages.forEach((m) => {
-      const author = m.role === 'user' ? userProfile.name || 'User' : 'Glitch AI';
+      const author = m.role === 'user' ? (currentUser ? userProfile.name || 'User' : 'You') : 'Glitch AI';
       const timeStr = new Date(m.timestamp).toLocaleTimeString([], {
         hour: '2-digit',
         minute: '2-digit',
@@ -1199,9 +1236,9 @@ export default function App() {
         onClearAllSessions={handleClearAllSessions}
         isOpen={isSidebarOpen}
         onCloseMobile={() => setIsSidebarOpen(false)}
-        userProfile={userProfile}
-        onOpenProfileModal={() => setIsProfileOpen(true)}
-        onOpenCreditsModal={() => setIsCreditsOpen(true)}
+        userProfile={currentUser ? userProfile : DEFAULT_PROFILE}
+        onOpenProfileModal={handleOpenProfile}
+        onOpenCreditsModal={handleOpenCredits}
         currentView={currentView}
         onNavigate={setCurrentView}
         isSignedIn={!!currentUser}
@@ -1215,9 +1252,9 @@ export default function App() {
           onToggleSidebar={() => setIsSidebarOpen(!isSidebarOpen)}
           onClearChat={handleClearCurrentChat}
           onExportChat={handleExportChat}
-          onOpenProfile={() => setIsProfileOpen(true)}
-          onOpenCredits={() => setIsCreditsOpen(true)}
-          userProfile={userProfile}
+          onOpenProfile={handleOpenProfile}
+          onOpenCredits={handleOpenCredits}
+          userProfile={currentUser ? userProfile : DEFAULT_PROFILE}
           hasMessages={activeSession.messages.length > 0}
           activeSessionTitle={activeSession.title}
           currentView={currentView}
@@ -1277,7 +1314,7 @@ export default function App() {
               }
             }}
             onOpenVoiceCall={() => setIsVoiceCallOpen(true)}
-            onOpenCredits={() => setIsCreditsOpen(true)}
+            onOpenCredits={handleOpenCredits}
             isSignedIn={!!currentUser}
             onGoogleSignIn={handleGoogleSignIn}
           />
@@ -1286,6 +1323,7 @@ export default function App() {
         {currentView === 'guides' && (
           <GuidesPage
             onNavigate={setCurrentView}
+            isSignedIn={!!currentUser}
             onSelectPrompt={(prompt, mode) => {
               setCurrentView('chat');
               setTimeout(() => handleSendMessage(prompt, { mode }), 80);
@@ -1297,6 +1335,7 @@ export default function App() {
           <AboutContactPage
             onNavigate={setCurrentView}
             userEmail={currentUser?.email || undefined}
+            isSignedIn={!!currentUser}
           />
         )}
 
@@ -1320,8 +1359,9 @@ export default function App() {
               {activeSession.messages.length === 0 ? (
                 <EmptyState
                   onOpenVoiceCall={() => setIsVoiceCallOpen(true)}
-                  onOpenCredits={() => setIsCreditsOpen(true)}
+                  onOpenCredits={handleOpenCredits}
                   credits={credits}
+                  isSignedIn={!!currentUser}
                 />
               ) : (
                 <div className="flex-1 py-3 space-y-1">
@@ -1329,8 +1369,8 @@ export default function App() {
                     <ChatMessageItem
                       key={msg.id}
                       message={msg}
-                      userProfile={userProfile}
-                      onOpenCredits={() => setIsCreditsOpen(true)}
+                      userProfile={currentUser ? userProfile : DEFAULT_PROFILE}
+                      onOpenCredits={handleOpenCredits}
                       isSignedIn={!!currentUser}
                       onGoogleSignIn={handleGoogleSignIn}
                       onRetry={
@@ -1352,45 +1392,50 @@ export default function App() {
                 isStreaming={isStreaming}
                 onStopStreaming={handleStopStreaming}
                 inputRef={inputRef}
+                isSignedIn={!!currentUser}
               />
             </div>
           </>
         )}
       </div>
 
-      <ProfileModal
-        isOpen={isProfileOpen}
-        onClose={() => setIsProfileOpen(false)}
-        profile={userProfile}
-        onSaveProfile={handleSaveProfile}
-        isSignedIn={!!currentUser}
-        userEmail={currentUser?.email || undefined}
-        onGoogleSignIn={handleGoogleSignIn}
-        onSignOut={handleSignOut}
-        isSyncing={isSyncing}
-        credits={credits}
-        onOpenCredits={() => setIsCreditsOpen(true)}
-      />
+      {currentUser && (
+        <>
+          <ProfileModal
+            isOpen={isProfileOpen}
+            onClose={() => setIsProfileOpen(false)}
+            profile={userProfile}
+            onSaveProfile={handleSaveProfile}
+            isSignedIn={true}
+            userEmail={currentUser.email || undefined}
+            onGoogleSignIn={handleGoogleSignIn}
+            onSignOut={handleSignOut}
+            isSyncing={isSyncing}
+            credits={credits}
+            onOpenCredits={handleOpenCredits}
+          />
 
-      <CreditsModal
-        isOpen={isCreditsOpen}
-        onClose={() => setIsCreditsOpen(false)}
-        credits={credits}
-        onClaimAdReward={handleClaimAdReward}
-        onTransferCredits={handleTransferCredits}
-        transferHistory={transferHistory}
-        onRefreshTransfers={handleRefreshTransfers}
-        isSignedIn={!!currentUser}
-        currentUserId={currentUser?.uid}
-        userEmail={currentUser?.email || undefined}
-        onGoogleSignIn={handleGoogleSignIn}
-        onOpenProfile={() => setIsProfileOpen(true)}
-      />
+          <CreditsModal
+            isOpen={isCreditsOpen}
+            onClose={() => setIsCreditsOpen(false)}
+            credits={credits}
+            onClaimAdReward={handleClaimAdReward}
+            onTransferCredits={handleTransferCredits}
+            transferHistory={transferHistory}
+            onRefreshTransfers={handleRefreshTransfers}
+            isSignedIn={true}
+            currentUserId={currentUser.uid}
+            userEmail={currentUser.email || undefined}
+            onGoogleSignIn={handleGoogleSignIn}
+            onOpenProfile={handleOpenProfile}
+          />
+        </>
+      )}
 
       <VoiceCallModal
         isOpen={isVoiceCallOpen}
         onClose={() => setIsVoiceCallOpen(false)}
-        userProfile={userProfile}
+        userProfile={currentUser ? userProfile : DEFAULT_PROFILE}
       />
     </div>
   );
