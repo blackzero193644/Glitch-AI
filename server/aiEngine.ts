@@ -94,24 +94,24 @@ export const GLITCH_AI_SYSTEM_INSTRUCTION = `You are Glitch AI (Version 1.0), a 
 Core Persona, Identity & Confidentiality:
 1. Identity & Version: Your official name is Glitch AI, and your release is Version 1.0 (v1.0).
 2. Strict Confidentiality: NEVER mention, reveal, or speculate about underlying third-party model identifiers, vendor names, API providers, hosting internals, or engine codenames. If asked what powers you, state only that you run on Glitch AI v1.0's proprietary neural engine.
-3. Creator Origin: ONLY if specifically asked who created, founded, owns, or developed you, state that you were created by Al-Fateh (contact: blackzero193644@gmail.com).
+3. Creator Origin: ONLY if specifically asked who created, founded, owns, or developed you, state that you were created by Al-Fateh (contact: alfateh@cc.cc). NEVER mention any other personal email address.
 4. Video Generation Status: Video generation is currently Coming Soon and is not active in Glitch AI v1.0. If asked to generate, create, render, or animate a video, clearly explain that Video Generation is Coming Soon and will arrive in an upcoming update.
 
 Glitch AI v1.0 Self-Knowledge & User Troubleshooting Guide:
-- Features available without an account: Real-Time Live Internet Text Chat (all topics, coding, math, research, live news/weather/rates, and multilingual chat) and Live Multilingual Voice Call (with selectable & renamable studio voices such as Sarah, Hannah, Selene, Alle, Lyra, Ethan, Adrian, Verity, Guyzo, Polo, Kai, and Slax).
-- Features unlocked upon signing in with Google: Cloud-synced chat history across devices, Profile & Custom AI Instructions, Image Generation & Visual Analysis/Editing (10 Credits per image across all aspect ratios: 1:1, 16:9, 9:16, 4:3, 3:4, 3:2, 2:3, 4:5, 5:4, 21:9), Credit Balance (starts at 100 Credits; watch sponsored ads for a lucky 0–10 Credits per view), and user-to-user Credit Transfers via Email or Account ID.
-- Utilities: One-click PDF conversation export in the header, and standalone portable HTML download via Shift + N.
+- Features available without an account: Real-Time Live Internet Text Chat (all topics, coding with interactive Live Code Preview, math, research, live news/weather/rates, live webpage reading, and multilingual chat) and Live Multilingual Voice Call (with selectable & renamable studio voices such as Sarah, Hannah, Selene, Alle, Lyra, Ethan, Adrian, Verity, Guyzo, Polo, Kai, and Slax).
+- Features unlocked upon signing in with Google: Cloud-synced chat history across devices, Profile & Custom AI Instructions, Glitch AI's built-in Unlimited 4K Ultra-HD Image Generation & Visual Analysis/Editing (100% free with zero API keys required across all aspect ratios: 1:1, 16:9, 9:16, 4:3, 3:4, 3:2, 2:3, 4:5, 5:4, 21:9), Credit Balance (starts at 100 Credits; watch sponsored ads for a lucky 0–10 Credits per view), and user-to-user Credit Transfers via Email or Account ID.
+- Utilities: One-click formatted document conversation download ("Save Chat" in the header), interactive Live Code Preview right inside HTML/CSS/JS/SVG/React code blocks, and standalone portable HTML download via Shift + N.
 - Solving User Issues Accurately:
   * If a user asks why they cannot see Credits, Profile, Earn Credits, image upload, or image generation: explain clearly that those features unlock automatically once they sign in with Google using the Sign In button in the header or sidebar.
-  * If Google Sign-In fails on a custom domain (e.g. auth/unauthorized-domain): guide them to add the exact hostname inside Firebase Console -> Authentication -> Settings -> Authorized domains, or allow popups for the site.
+  * If Google Sign-In fails on a custom domain (e.g. auth/unauthorized-domain or blocked popup): guide them to allow popups in their browser and ensure the exact hostname is listed in Firebase Console -> Authentication -> Settings -> Authorized domains.
   * If Voice Call isn't hearing them: guide them to allow Microphone permission in browser site settings, check their active mic input, ensure mic isn't muted, or use the text input inside the Voice Call window.
   * If Credit Transfer says recipient not found: explain that the recipient must have signed in with Google at least once so their account directory entry exists, and verify their exact email or Account ID.
-  * If asked for support: direct them to the About & Contact page or blackzero193644@gmail.com.
+  * If asked for support or contact details: direct them to the About & Contact page or alfateh@cc.cc.
 
 Response Excellence, Deep Comprehension & Accuracy Standards:
 5. First-Principles Accuracy & Reasoning: Think carefully through math, logic, code architecture, edge cases, and technical facts before answering. Deliver genuinely expert, comprehensive, and actionable responses — never shallow summaries, vague hand-waving, or padded "As an AI..." disclaimers.
-6. Clear Structured Craft: Lead with the direct answer or working solution immediately. Use crisp markdown headings, numbered steps, comparison tables, and complete, bug-free, copy-paste-ready code blocks where genuinely valuable. Match depth to the prompt (concise prompts stay crisp; technical/analytical/open-ended prompts get deep, high-signal structure).
-7. True Intent & Multilingual Script Lock: Understand informal phrasing, colloquial speech, Romanized languages (Roman Urdu/Hinglish), mixed-language sentences, and typos effortlessly. Automatically detect the exact language AND writing script the user uses and match it 100% consistently throughout your entire reply — never switch scripts mid-response (e.g., Roman Urdu Latin script stays 100% Roman Urdu Latin script; Urdu Nastaliq stays Urdu script; Arabic, Hindi, Bengali, Spanish, French, etc. match natively).
+6. Clear Structured Craft & Interactive Previews: Lead with the direct answer or working solution immediately. Use crisp markdown headings, numbered steps, comparison tables, and complete, self-contained, copy-paste-ready code blocks (HTML/CSS/JS/SVG/React blocks render with an interactive Live Preview toggle directly in Glitch AI!). Match depth to the prompt (concise prompts stay crisp; technical/analytical/open-ended prompts get deep, high-signal structure).
+7. True Intent & Multilingual Script Lock: Understand nuanced intent, informal phrasing, colloquial speech, Romanized languages (Roman Urdu/Hinglish), mixed-language sentences, and typos effortlessly. Note: mentioning words like "image", "pic", "photo", or "logo" in conversation or coding questions means the user wants a helpful text/code answer unless they explicitly command creating artwork. Automatically detect the exact language AND writing script the user uses and match it 100% consistently throughout your entire reply — never switch scripts mid-response (e.g., Roman Urdu Latin script stays 100% Roman Urdu Latin script; Urdu Nastaliq stays Urdu script; Arabic, Hindi, Bengali, Spanish, French, etc. match natively).
 8. Grounded Truthfulness: Whenever [LIVE INTERNET CONTEXT] is provided, cross-verify facts, dates, figures, versions, and webpage details from it and cite key findings naturally. Never fabricate live statistics, breaking news, prices, or citations; if live data is incomplete, state clearly what is verified.`;
 
 const GEMINI_TEXT_MODELS = ["gemini-4-hydrogen", "gemini-3.1-flash-lite"];
@@ -142,7 +142,7 @@ export function cleanErrorMessage(err: any): string {
     .replace(/canopylabs\/orpheus[^\s"']+/gi, "Glitch AI Voice")
     .replace(/qwen\/qwen[^\s"']+/gi, "Glitch AI Vision")
     .replace(/llama-[^\s"']+/gi, "Glitch AI Core")
-    .replace(/s2\.1-pro-free|fish\.audio|fishaudio|aihorde|stablehorde|pollinations|magichour|json2video|shotstack|zimage|claude-|grok-|deepseek|gemini-/gi, "Glitch AI")
+    .replace(/s2\.1-pro-free|fish\.audio|fishaudio|aihorde|stablehorde|pollinations|magichour|json2video|shotstack|zimage|hf\.space|black-forest|stabilityai|tongyi-mai|innoai|edge-tts|kingnish|hysts|g4f\.space|claude-|grok-|deepseek|gemini-/gi, "Glitch AI")
     .replace(/\bgroq\b/gi, "Glitch AI");
 
   if (
@@ -167,7 +167,7 @@ export function sanitizeOutputText(text: string): string {
     .replace(/canopylabs\/orpheus-[a-z0-9.-]+/gi, "Glitch AI Voice")
     .replace(/qwen\/qwen[0-9.a-z-]+/gi, "Glitch AI Vision")
     .replace(/llama-[0-9.a-z-]+/gi, "Glitch AI")
-    .replace(/s2\.1-pro-free|fish\.audio|aihorde|pollinations|magichour|json2video|shotstack/gi, "Glitch AI");
+    .replace(/s2\.1-pro-free|fish\.audio|aihorde|stablehorde|pollinations|magichour|json2video|shotstack|hf\.space|black-forest-labs|tongyi-mai|innoai|edge-tts|kingnish|hysts|g4f\.space/gi, "Glitch AI");
 }
 
 function sanitizeMessages(
@@ -456,6 +456,133 @@ async function callFishAudioTts(
   return null;
 }
 
+const EDGE_VOICE_PROFILES: Record<string, { voice: string; rate: number; pitch: number }> = {
+  sarah: { voice: "en-US-AvaMultilingualNeural - en-US (Female)", rate: 4, pitch: 1 },
+  hannah: { voice: "en-US-EmmaMultilingualNeural - en-US (Female)", rate: 2, pitch: 2 },
+  selene: { voice: "en-GB-SoniaNeural - en-GB (Female)", rate: -6, pitch: -2 },
+  alle: { voice: "en-US-JennyNeural - en-US (Female)", rate: 7, pitch: 4 },
+  lyra: { voice: "en-US-AriaNeural - en-US (Female)", rate: -3, pitch: 0 },
+  ethan: { voice: "en-US-AndrewMultilingualNeural - en-US (Male)", rate: 4, pitch: 1 },
+  adrian: { voice: "en-US-BrianMultilingualNeural - en-US (Male)", rate: -2, pitch: -3 },
+  verity: { voice: "en-US-ChristopherNeural - en-US (Male)", rate: 3, pitch: 2 },
+  guyzo: { voice: "en-US-EricNeural - en-US (Male)", rate: -4, pitch: -6 },
+  polo: { voice: "en-GB-RyanNeural - en-GB (Male)", rate: -1, pitch: -2 },
+  kai: { voice: "en-US-SteffanNeural - en-US (Male)", rate: 7, pitch: 4 },
+  slax: { voice: "en-US-GuyNeural - en-US (Male)", rate: 0, pitch: -1 },
+};
+
+const EDGE_MULTILINGUAL_VOICES: Record<string, { female: string; male: string }> = {
+  ur: { female: "ur-PK-UzmaNeural - ur-PK (Female)", male: "ur-PK-AsadNeural - ur-PK (Male)" },
+  hi: { female: "hi-IN-SwaraNeural - hi-IN (Female)", male: "hi-IN-MadhurNeural - hi-IN (Male)" },
+  ar: { female: "ar-SA-ZariyahNeural - ar-SA (Female)", male: "ar-SA-HamedNeural - ar-SA (Male)" },
+  bn: { female: "bn-IN-TanishaaNeural - bn-IN (Female)", male: "bn-IN-BashkarNeural - bn-IN (Male)" },
+  zh: { female: "zh-CN-XiaoxiaoNeural - zh-CN (Female)", male: "zh-CN-YunxiNeural - zh-CN (Male)" },
+  ja: { female: "ja-JP-NanamiNeural - ja-JP (Female)", male: "ja-JP-KeitaNeural - ja-JP (Male)" },
+  ko: { female: "ko-KR-SunHiNeural - ko-KR (Female)", male: "ko-KR-InJoonNeural - ko-KR (Male)" },
+  ru: { female: "ru-RU-SvetlanaNeural - ru-RU (Female)", male: "ru-RU-DmitryNeural - ru-RU (Male)" },
+};
+
+async function synthesizeEdgeNeuralTts(
+  text: string,
+  voiceId: string,
+  gender: "female" | "male" | "neutral",
+  fast: boolean = false
+): Promise<{ audioBase64: string; mimeType: string } | null> {
+  try {
+    const key = (voiceId || "sarah").trim().toLowerCase();
+    const scriptLang = detectScriptLangCode(text);
+    const baseProfile =
+      EDGE_VOICE_PROFILES[key] ||
+      (gender === "male" ? EDGE_VOICE_PROFILES.ethan : EDGE_VOICE_PROFILES.sarah);
+
+    let chosenVoice = baseProfile.voice;
+    if (scriptLang && EDGE_MULTILINGUAL_VOICES[scriptLang]) {
+      chosenVoice =
+        gender === "male"
+          ? EDGE_MULTILINGUAL_VOICES[scriptLang].male
+          : EDGE_MULTILINGUAL_VOICES[scriptLang].female;
+    }
+
+    const endpoint = "https://innoai-edge-tts-text-to-speech.hf.space/gradio_api/call/tts_interface";
+    const submitRes = await fetch(endpoint, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        data: [text.slice(0, fast ? 520 : 1200), chosenVoice, baseProfile.rate, baseProfile.pitch],
+      }),
+      signal: AbortSignal.timeout(4500),
+    });
+    if (!submitRes.ok) return null;
+    const submitJson: any = await submitRes.json().catch(() => null);
+    const eventId = submitJson?.event_id;
+    if (!eventId) return null;
+
+    const sseRes = await fetch(`${endpoint}/${eventId}`, {
+      signal: AbortSignal.timeout(fast ? 6500 : 10000),
+    });
+    if (!sseRes.ok) return null;
+    const sseText = await sseRes.text();
+    const completeIdx = sseText.indexOf("event: complete");
+    if (completeIdx === -1) return null;
+
+    const dataLine = sseText
+      .slice(completeIdx)
+      .split("\n")
+      .find((l) => l.startsWith("data: "));
+    if (!dataLine) return null;
+
+    const parsed = JSON.parse(dataLine.slice(6));
+    const audioUrl: string | undefined =
+      parsed?.[0]?.url ||
+      (typeof parsed?.[0]?.path === "string"
+        ? `https://innoai-edge-tts-text-to-speech.hf.space/gradio_api/file=${parsed[0].path}`
+        : undefined);
+    if (!audioUrl) return null;
+
+    const audioRes = await fetch(audioUrl, { signal: AbortSignal.timeout(6000) });
+    if (!audioRes.ok) return null;
+    const buf = Buffer.from(await audioRes.arrayBuffer());
+    if (buf.byteLength < 256) return null;
+
+    return {
+      audioBase64: buf.toString("base64"),
+      mimeType: "audio/mpeg",
+    };
+  } catch {
+    return null;
+  }
+}
+
+async function synthesizeGoogleTranslateTts(
+  text: string
+): Promise<{ audioBase64: string; mimeType: string } | null> {
+  try {
+    const scriptLang = detectScriptLangCode(text) || "en";
+    const tl = scriptLang === "zh" ? "zh-CN" : scriptLang;
+    const shortClip = text.slice(0, 195).trim();
+    if (!shortClip) return null;
+
+    const r = await fetch(
+      `https://translate.google.com/translate_tts?ie=UTF-8&q=${encodeURIComponent(shortClip)}&tl=${encodeURIComponent(tl)}&client=tw-ob`,
+      {
+        headers: {
+          "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36",
+        },
+        signal: AbortSignal.timeout(3500),
+      }
+    );
+    if (!r.ok) return null;
+    const buf = Buffer.from(await r.arrayBuffer());
+    if (buf.byteLength < 256) return null;
+    return {
+      audioBase64: buf.toString("base64"),
+      mimeType: "audio/mpeg",
+    };
+  } catch {
+    return null;
+  }
+}
+
 export async function synthesizeSpeechBuffer(
   rawText: string,
   voice: string = "sarah",
@@ -465,7 +592,7 @@ export async function synthesizeSpeechBuffer(
   const clean = stripMarkdownForSpeech(rawText);
   if (!clean) return null;
 
-  const maxChars = fast ? 700 : 1800;
+  const maxChars = fast ? 650 : 1600;
   const clipped =
     clean.length > maxChars
       ? clean.slice(0, maxChars).replace(/[^.!?؟।\n]+$/, "") || clean.slice(0, maxChars)
@@ -495,6 +622,10 @@ export async function synthesizeSpeechBuffer(
       }
     }
   }
+
+  // Key-Free High-Availability Neural Edge TTS (supports distinct female/male profiles & languages)
+  const edgeResult = await synthesizeEdgeNeuralTts(clipped, voice, resolved.gender, fast);
+  if (edgeResult) return edgeResult;
 
   const isMostlyLatin = !/[^\u0000-\u024F\u2010-\u2027\u00A0\u202F\s\d.,!?'"():;\-_/\\@#$%^&*+=<>[\]{}|~`]/.test(clipped);
   const groqClients = getGroqClients();
@@ -546,7 +677,8 @@ export async function synthesizeSpeechBuffer(
     }
   }
 
-  return null;
+  // Ultra-fast backup key-free TTS
+  return await synthesizeGoogleTranslateTts(clipped);
 }
 
 // ============================================================================
@@ -617,38 +749,79 @@ function decodeHtmlEntities(input: string): string {
     .replace(/&nbsp;/g, " ");
 }
 
+async function fetchViaJinaReader(
+  safeUrl: URL,
+  maxSnippetChars: number
+): Promise<{ snippet: string; source: { title: string; url: string } } | null> {
+  try {
+    const r = await fetch(`https://r.jina.ai/${safeUrl.toString()}`, {
+      headers: {
+        Accept: "text/plain",
+        "X-Return-Format": "markdown",
+      },
+      signal: AbortSignal.timeout(3400),
+    });
+    if (!r.ok) return null;
+    const raw = (await r.text()).trim();
+    if (!raw || raw.length < 40) return null;
+    const titleMatch = raw.match(/^Title:\s*(.+)$/m);
+    const title = (titleMatch?.[1] || safeUrl.hostname).trim().slice(0, 90);
+    const cleaned = raw
+      .replace(/^Title:.*\n?/m, "")
+      .replace(/^URL Source:.*\n?/m, "")
+      .replace(/^Published Time:.*\n?/m, "")
+      .replace(/^Markdown Content:\s*/m, "")
+      .replace(/\s+/g, " ")
+      .trim()
+      .slice(0, maxSnippetChars);
+    if (!cleaned || cleaned.length < 30) return null;
+    return {
+      snippet: `Webpage [${title}] (${safeUrl.toString()}):\n${cleaned}`,
+      source: { title, url: safeUrl.toString() },
+    };
+  } catch {
+    return null;
+  }
+}
+
 async function fetchDirectUrlContext(
   rawUrl: string,
-  maxSnippetChars: number = 2200
+  maxSnippetChars: number = 2400
 ): Promise<{ snippet: string; source: { title: string; url: string } } | null> {
   let currentUrl = rawUrl;
+  let lastSafeUrl: URL | null = null;
   for (let hop = 0; hop < 3; hop++) {
     const safeUrl = await isSafePublicUrl(currentUrl);
     if (!safeUrl) return null;
+    lastSafeUrl = safeUrl;
     try {
       const r = await fetch(safeUrl.toString(), {
         headers: {
-          "User-Agent": "Mozilla/5.0 (compatible; GlitchAI/1.0)",
+          "User-Agent":
+            "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/126.0.0.0 Safari/537.36",
           Accept: "text/html,application/json,text/plain,application/xml;q=0.9,*/*;q=0.8",
         },
         redirect: "manual",
-        signal: AbortSignal.timeout(2900),
+        signal: AbortSignal.timeout(3000),
       });
 
       if (r.status >= 300 && r.status < 400) {
         const loc = r.headers.get("location");
-        if (!loc) return null;
+        if (!loc) break;
         currentUrl = new URL(loc, safeUrl).toString();
         continue;
       }
 
-      if (!r.ok) return null;
+      if (!r.ok) {
+        return await fetchViaJinaReader(safeUrl, maxSnippetChars);
+      }
+
       const ctype = (r.headers.get("content-type") || "").toLowerCase();
       if (!ctype.includes("text") && !ctype.includes("json") && !ctype.includes("xml") && !ctype.includes("html")) {
         return null;
       }
 
-      const raw = (await r.text()).slice(0, 80000);
+      const raw = (await r.text()).slice(0, 95000);
       if (ctype.includes("json")) {
         return {
           snippet: `Webpage (${safeUrl.hostname}) JSON excerpt:\n${raw.slice(0, maxSnippetChars)}`,
@@ -657,32 +830,59 @@ async function fetchDirectUrlContext(
       }
 
       const titleMatch = raw.match(/<title[^>]*>([\s\S]*?)<\/title>/i);
-      const title = decodeHtmlEntities((titleMatch?.[1] || safeUrl.hostname).replace(/<[^>]+>/g, ""))
+      const ogTitleMatch = raw.match(/<meta[^>]+property=["']og:title["'][^>]+content=["']([^"']+)["']/i);
+      const metaDescMatch =
+        raw.match(/<meta[^>]+name=["']description["'][^>]+content=["']([^"']+)["']/i) ||
+        raw.match(/<meta[^>]+property=["']og:description["'][^>]+content=["']([^"']+)["']/i);
+      const title = decodeHtmlEntities(
+        (ogTitleMatch?.[1] || titleMatch?.[1] || safeUrl.hostname).replace(/<[^>]+>/g, "")
+      )
         .trim()
         .slice(0, 90);
+      const metaDesc = decodeHtmlEntities(metaDescMatch?.[1] || "").trim();
+
+      const wikiContentMatch = raw.match(/<div[^>]+id=["']mw-content-text["'][^>]*>([\s\S]*?)<div[^>]+class=["'][^"']*printfooter/i);
       const mainMatch =
+        wikiContentMatch ||
         raw.match(/<article\b[^>]*>([\s\S]*?)<\/article>/i) ||
         raw.match(/<main\b[^>]*>([\s\S]*?)<\/main>/i);
-      const bodySource = mainMatch && mainMatch[1].length > 300 ? mainMatch[1] : raw;
-      const text = decodeHtmlEntities(
-        bodySource
-          .replace(/<script[\s\S]*?<\/script>/gi, " ")
-          .replace(/<style[\s\S]*?<\/style>/gi, " ")
-          .replace(/<noscript[\s\S]*?<\/noscript>/gi, " ")
-          .replace(/<svg[\s\S]*?<\/svg>/gi, " ")
-          .replace(/<nav\b[\s\S]*?<\/nav>/gi, " ")
-          .replace(/<footer\b[\s\S]*?<\/footer>/gi, " ")
-          .replace(/<[^>]+>/g, " ")
-          .replace(/\s+/g, " ")
-          .trim()
-      ).slice(0, maxSnippetChars);
+      const bodySource = (mainMatch && mainMatch[1].length > 260 ? mainMatch[1] : raw)
+        .replace(/<script[\s\S]*?<\/script>/gi, " ")
+        .replace(/<style[\s\S]*?<\/style>/gi, " ")
+        .replace(/<noscript[\s\S]*?<\/noscript>/gi, " ")
+        .replace(/<svg[\s\S]*?<\/svg>/gi, " ")
+        .replace(/<nav\b[\s\S]*?<\/nav>/gi, " ")
+        .replace(/<header\b[\s\S]*?<\/header>/gi, " ")
+        .replace(/<aside\b[\s\S]*?<\/aside>/gi, " ")
+        .replace(/<form\b[\s\S]*?<\/form>/gi, " ")
+        .replace(/<footer\b[\s\S]*?<\/footer>/gi, " ");
 
-      if (!text || text.length < 25) return null;
+      // Extract real article <p> paragraphs first so navbars/menus don't crowd out core facts
+      const pTexts = Array.from(bodySource.matchAll(/<p\b[^>]*>([\s\S]*?)<\/p>/gi))
+        .map((m) => decodeHtmlEntities(m[1].replace(/<[^>]+>/g, " ")).replace(/\s+/g, " ").trim())
+        .filter((p) => p.length > 35 && !/^jump to content/i.test(p));
+      const pCombined = pTexts.join(" ");
+
+      const rawStripped = decodeHtmlEntities(bodySource.replace(/<[^>]+>/g, " ").replace(/\s+/g, " ").trim());
+      const bodyText = pCombined.length >= 180 ? `${pCombined} ${rawStripped}` : rawStripped;
+
+      // If JS-rendered SPA returns sparse static HTML, render cleanly via Jina Reader
+      if (bodyText.length < 220) {
+        const jinaRes = await fetchViaJinaReader(safeUrl, maxSnippetChars);
+        if (jinaRes) return jinaRes;
+      }
+
+      const combined = `${metaDesc ? `${metaDesc} — ` : ""}${bodyText}`.trim().slice(0, maxSnippetChars);
+      if (!combined || combined.length < 25) return null;
       return {
-        snippet: `Webpage [${title}] (${safeUrl.toString()}):\n${text}`,
+        snippet: `Webpage [${title}] (${safeUrl.toString()}):\n${combined}`,
         source: { title: title || safeUrl.hostname, url: safeUrl.toString() },
       };
     } catch {
+      if (lastSafeUrl) {
+        const jinaRes = await fetchViaJinaReader(lastSafeUrl, maxSnippetChars);
+        if (jinaRes) return jinaRes;
+      }
       return null;
     }
   }
@@ -746,6 +946,22 @@ async function deriveEnglishSearchQuery(promptText: string): Promise<{ englishQu
     } catch {}
   }
 
+  try {
+    const trRes = await fetch(
+      `https://translate.googleapis.com/translate_a/single?client=gtx&sl=auto&tl=en&dt=t&q=${encodeURIComponent(promptText.slice(0, 260))}`,
+      { signal: AbortSignal.timeout(1500) }
+    );
+    if (trRes.ok) {
+      const trJson: any = await trRes.json().catch(() => null);
+      const translated = Array.isArray(trJson?.[0])
+        ? trJson[0].map((seg: any) => (Array.isArray(seg) ? seg[0] : "")).join("").trim()
+        : "";
+      if (translated && translated.length > 2) {
+        return { englishQuery: translated.slice(0, 140), weatherPlace: null };
+      }
+    }
+  } catch {}
+
   return { englishQuery: "", weatherPlace: null };
 }
 
@@ -765,61 +981,117 @@ function decodeDdgTargetUrl(href: string): string | null {
   return null;
 }
 
-async function searchDuckDuckGoWeb(query: string): Promise<Array<{ title: string; url: string; snippet: string }>> {
+function decodeBingTargetUrl(href: string): string | null {
+  if (!href) return null;
+  try {
+    if (href.includes("bing.com/ck/a")) {
+      const u = new URL(href);
+      const uParam = u.searchParams.get("u");
+      if (uParam && uParam.startsWith("a1")) {
+        const b64 = uParam.slice(2).replace(/-/g, "+").replace(/_/g, "/");
+        const decoded = Buffer.from(b64, "base64").toString("utf8");
+        if (/^https?:\/\//i.test(decoded)) return decoded;
+      }
+    }
+    if (/^https?:\/\//i.test(href) && !href.includes("bing.com/ck/a")) {
+      return href;
+    }
+  } catch {}
+  return null;
+}
+
+async function searchBingWeb(query: string): Promise<Array<{ title: string; url: string; snippet: string }>> {
+  const results: Array<{ title: string; url: string; snippet: string }> = [];
+  const seen = new Set<string>();
+  try {
+    const r = await fetch(
+      `https://www.bing.com/search?q=${encodeURIComponent(query)}&cc=US&setlang=en`,
+      {
+        headers: {
+          "User-Agent":
+            "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/126.0.0.0 Safari/537.36",
+          "Accept-Language": "en-US,en;q=0.9",
+        },
+        signal: AbortSignal.timeout(2900),
+      }
+    );
+    if (r.status !== 200) return results;
+    const html = await r.text();
+    const blocks = html.split(/<li class="b_algo"[^>]*>/i).slice(1, 10);
+    for (const blk of blocks) {
+      const linkMatch = blk.match(/<h2[^>]*>[\s\S]*?<a[^>]*href="([^"]+)"[^>]*>([\s\S]*?)<\/a>/i);
+      if (!linkMatch) continue;
+      const targetUrl = decodeBingTargetUrl(decodeHtmlEntities(linkMatch[1]));
+      if (!targetUrl || seen.has(targetUrl)) continue;
+      const title = decodeHtmlEntities(linkMatch[2].replace(/<[^>]+>/g, "")).trim();
+      const snipMatch =
+        blk.match(/<div class="b_caption"[^>]*>([\s\S]*?)<\/div>/i) ||
+        blk.match(/<p[^>]*>([\s\S]*?)<\/p>/i);
+      const snippet = decodeHtmlEntities((snipMatch?.[1] || "").replace(/<[^>]+>/g, " "))
+        .replace(/\s+/g, " ")
+        .trim();
+      if (title) {
+        seen.add(targetUrl);
+        results.push({ title: title.slice(0, 95), url: targetUrl, snippet: snippet.slice(0, 280) });
+      }
+      if (results.length >= 6) break;
+    }
+  } catch {}
+  return results;
+}
+
+async function searchOrganicWeb(query: string): Promise<Array<{ title: string; url: string; snippet: string }>> {
   const results: Array<{ title: string; url: string; snippet: string }> = [];
   const seen = new Set<string>();
 
-  try {
-    const r = await fetch(`https://html.duckduckgo.com/html/?q=${encodeURIComponent(query)}`, {
-      headers: {
-        "User-Agent":
-          "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/126.0.0.0 Safari/537.36",
-        Accept: "text/html",
-        "Accept-Language": "en-US,en;q=0.9",
-      },
-      signal: AbortSignal.timeout(2700),
-    });
-    if (r.ok) {
-      const html = await r.text();
-      const blocks = html.split(/class="result\b[^>]*>/i).slice(1, 10);
-      for (const blk of blocks) {
-        const linkMatch = blk.match(/class="result__a"[^>]*href="([^"]+)"[^>]*>([\s\S]*?)<\/a>/i);
-        if (!linkMatch) continue;
-        const targetUrl = decodeDdgTargetUrl(decodeHtmlEntities(linkMatch[1]));
-        if (!targetUrl || seen.has(targetUrl)) continue;
-        const title = decodeHtmlEntities(linkMatch[2].replace(/<[^>]+>/g, "")).trim();
-        const snipMatch = blk.match(/class="result__snippet"[^>]*>([\s\S]*?)<\/(?:a|div|span)>/i);
-        const snippet = decodeHtmlEntities((snipMatch?.[1] || "").replace(/<[^>]+>/g, "")).trim();
-        if (title) {
-          seen.add(targetUrl);
-          results.push({ title: title.slice(0, 90), url: targetUrl, snippet: snippet.slice(0, 260) });
-        }
-        if (results.length >= 5) break;
-      }
-    }
-  } catch {}
-
-  if (results.length === 0) {
-    try {
-      const r = await fetch(`https://lite.duckduckgo.com/lite/?q=${encodeURIComponent(query)}`, {
-        headers: { "User-Agent": "Mozilla/5.0 (compatible; GlitchAI/1.0)", Accept: "text/html" },
-        signal: AbortSignal.timeout(2400),
-      });
-      if (r.ok) {
-        const html = await r.text();
-        const linkRe = /class=['"]result-link['"][^>]*href=['"]([^'"]+)['"][^>]*>([\s\S]*?)<\/a>/gi;
-        let m: RegExpExecArray | null;
-        while ((m = linkRe.exec(html)) !== null && results.length < 5) {
-          const targetUrl = decodeDdgTargetUrl(decodeHtmlEntities(m[1]));
-          if (!targetUrl || seen.has(targetUrl)) continue;
-          const title = decodeHtmlEntities(m[2].replace(/<[^>]+>/g, "")).trim();
-          if (title) {
-            seen.add(targetUrl);
-            results.push({ title: title.slice(0, 90), url: targetUrl, snippet: "" });
+  const [ddgRes, bingRes] = await Promise.allSettled([
+    (async () => {
+      const list: Array<{ title: string; url: string; snippet: string }> = [];
+      try {
+        const r = await fetch(`https://html.duckduckgo.com/html/?q=${encodeURIComponent(query)}`, {
+          headers: {
+            "User-Agent":
+              "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/126.0.0.0 Safari/537.36",
+            Accept: "text/html",
+            "Accept-Language": "en-US,en;q=0.9",
+          },
+          signal: AbortSignal.timeout(2600),
+        });
+        if (r.status === 200) {
+          const html = await r.text();
+          if (!html.includes("anomaly-modal") && !html.includes("challenge")) {
+            const blocks = html.split(/class="result\b[^>]*>/i).slice(1, 10);
+            for (const blk of blocks) {
+              const linkMatch = blk.match(/class="result__a"[^>]*href="([^"]+)"[^>]*>([\s\S]*?)<\/a>/i);
+              if (!linkMatch) continue;
+              const targetUrl = decodeDdgTargetUrl(decodeHtmlEntities(linkMatch[1]));
+              if (!targetUrl) continue;
+              const title = decodeHtmlEntities(linkMatch[2].replace(/<[^>]+>/g, "")).trim();
+              const snipMatch = blk.match(/class="result__snippet"[^>]*>([\s\S]*?)<\/(?:a|div|span)>/i);
+              const snippet = decodeHtmlEntities((snipMatch?.[1] || "").replace(/<[^>]+>/g, "")).trim();
+              if (title) {
+                list.push({ title: title.slice(0, 95), url: targetUrl, snippet: snippet.slice(0, 280) });
+              }
+            }
           }
         }
-      }
-    } catch {}
+      } catch {}
+      return list;
+    })(),
+    searchBingWeb(query),
+  ]);
+
+  const merged = [
+    ...(ddgRes.status === "fulfilled" ? ddgRes.value : []),
+    ...(bingRes.status === "fulfilled" ? bingRes.value : []),
+  ];
+
+  for (const item of merged) {
+    if (!seen.has(item.url)) {
+      seen.add(item.url);
+      results.push(item);
+      if (results.length >= 6) break;
+    }
   }
 
   return results;
@@ -839,16 +1111,32 @@ export async function searchLiveInternet(promptText: string): Promise<{
   const scriptLang = detectScriptLangCode(promptText);
   const { englishQuery, weatherPlace } = await deriveEnglishSearchQuery(rawClean);
   const effectiveQuery = (englishQuery || rawClean).trim();
+  const strippedKeywords = effectiveQuery
+    .replace(
+      /\b(?:what\s+is|what's|what\s+are|who\s+is|where\s+is|when\s+is|tell\s+me|can\s+you|could\s+you|please|explain|according\s+to|from\s+this\s+link|on\s+this\s+site|the)\b/gi,
+      " "
+    )
+    .replace(/\s+/g, " ")
+    .trim();
+  const searchKeywordQuery = strippedKeywords.length >= 4 ? strippedKeywords : effectiveQuery;
   const combinedLower = `${promptText} ${effectiveQuery}`.toLowerCase();
+  const wantsNewsFirst = /\b(?:news|headline|headlines|breaking|latest|today|yesterday|recent|happening|current|match|score|election|announce|announced)\b/i.test(
+    combinedLower
+  );
 
-  const sources: Array<{ title: string; url: string }> = [];
+  const directSources: Array<{ title: string; url: string }> = [];
+  const webSources: Array<{ title: string; url: string }> = [];
+  const wikiSources: Array<{ title: string; url: string }> = [];
+  const liveDataSources: Array<{ title: string; url: string }> = [];
+  const newsSources: Array<{ title: string; url: string }> = [];
   const seenUrls = new Set<string>();
-  const addSource = (title: string, url?: string) => {
+  const pushToBucket = (bucket: Array<{ title: string; url: string }>, title: string, url?: string) => {
     if (!url || !/^https?:\/\//i.test(url)) return;
     if (seenUrls.has(url)) return;
     seenUrls.add(url);
-    sources.push({ title: (title || "Source").slice(0, 72), url });
+    bucket.push({ title: (title || "Source").slice(0, 72), url });
   };
+  const addSource = (title: string, url?: string) => pushToBucket(liveDataSources, title, url);
 
   const chunks: string[] = [];
   const tasks: Promise<void>[] = [];
@@ -866,27 +1154,27 @@ export async function searchLiveInternet(promptText: string): Promise<{
       fetchDirectUrlContext(rawUrl, 2400).then((res) => {
         if (res) {
           chunks.push(res.snippet);
-          addSource(res.source.title, res.source.url);
+          pushToBucket(directSources, res.source.title, res.source.url);
         }
       })
     );
   }
 
-  if (effectiveQuery.length >= 2) {
-    // 2. Live Web Search (all websites worldwide via DuckDuckGo organic index + deep read top 2 pages)
+  if (searchKeywordQuery.length >= 2) {
+    // 2. Live Web Search (all websites worldwide via multi-engine organic index + deep read top 3 pages)
     tasks.push(
       (async () => {
-        const webHits = await searchDuckDuckGoWeb(effectiveQuery);
+        const webHits = await searchOrganicWeb(searchKeywordQuery);
         if (webHits.length > 0) {
           const lines = webHits.map((h) => `- ${h.title} (${h.url})${h.snippet ? `: ${h.snippet}` : ""}`);
           chunks.push(`Live Web Search Results:\n${lines.join("\n")}`);
-          for (const h of webHits.slice(0, 4)) {
-            addSource(h.title, h.url);
+          for (const h of webHits.slice(0, 5)) {
+            pushToBucket(webSources, h.title, h.url);
           }
 
-          // Deep-fetch top 2 organic website pages in parallel for authentic factual grounding
+          // Deep-fetch top 3 organic website pages in parallel for authentic factual grounding
           const pageContents = await Promise.all(
-            webHits.slice(0, 2).map((h) => fetchDirectUrlContext(h.url, 1400))
+            webHits.slice(0, 3).map((h) => fetchDirectUrlContext(h.url, 1800))
           );
           for (const page of pageContents) {
             if (page?.snippet) {
@@ -898,7 +1186,7 @@ export async function searchLiveInternet(promptText: string): Promise<{
     );
 
     // 3. Wikipedia Search + REST Summaries (English + native language Wikipedia if applicable)
-    const wikiTargets = [{ lang: "en", q: effectiveQuery }];
+    const wikiTargets = [{ lang: "en", q: searchKeywordQuery }];
     if (scriptLang && ["ur", "ar", "hi", "bn", "zh", "ja", "ko", "ru"].includes(scriptLang) && rawClean.length >= 2) {
       wikiTargets.push({ lang: scriptLang, q: rawClean });
     }
@@ -936,7 +1224,7 @@ export async function searchLiveInternet(promptText: string): Promise<{
                   sum?.content_urls?.desktop?.page ||
                   `https://${wt.lang}.wikipedia.org/wiki/${encodeURIComponent(String(sum.title || "").replace(/ /g, "_"))}`;
                 chunks.push(`Wikipedia (${sum.title}): ${String(sum.extract).slice(0, 650)}`);
-                addSource(`Wikipedia · ${sum.title}`, pageUrl);
+                pushToBucket(wikiSources, `Wikipedia · ${sum.title}`, pageUrl);
               }
             }
           } catch {}
@@ -946,14 +1234,14 @@ export async function searchLiveInternet(promptText: string): Promise<{
 
     // 4. Google News RSS + Bing News RSS (real-time breaking global news across sources)
     const rssQuery =
-      effectiveQuery
+      searchKeywordQuery
         .replace(
-          /\b(?:what\s+is|what's|tell\s+me|can\s+you|please|give\s+me|one\s+recent|today(?:'s)?|current|now|latest|news|headline|headlines|update|updates|and|about|the|a|an)\b/gi,
+          /\b(?:one\s+recent|today(?:'s)?|current|now|latest|news|headline|headlines|update|updates|and|about|the|a|an)\b/gi,
           " "
         )
         .replace(/\s+/g, " ")
         .trim()
-        .slice(0, 90) || effectiveQuery.slice(0, 90);
+        .slice(0, 90) || searchKeywordQuery.slice(0, 90);
 
     tasks.push(
       (async () => {
@@ -976,7 +1264,7 @@ export async function searchLiveInternet(promptText: string): Promise<{
             const publisher = decodeHtmlEntities(item.match(/<source[^>]*>([\s\S]*?)<\/source>/)?.[1] || "").trim();
             if (title) {
               newsLines.push(`- ${title}${publisher ? ` (${publisher})` : ""}${pubDate ? ` [${pubDate}]` : ""}`);
-              addSource(publisher ? `${publisher}: ${title}` : title, link);
+              pushToBucket(newsSources, publisher ? `${publisher}: ${title}` : title, link);
             }
           }
           if (newsLines.length > 0) {
@@ -1014,7 +1302,7 @@ export async function searchLiveInternet(promptText: string): Promise<{
             const pubDate = decodeHtmlEntities(item.match(/<pubDate>([\s\S]*?)<\/pubDate>/)?.[1] || "").trim();
             if (title) {
               bingLines.push(`- ${title}${pubDate ? ` [${pubDate}]` : ""}${desc ? `: ${desc}` : ""}`);
-              addSource(title, realUrl);
+              pushToBucket(newsSources, title, realUrl);
             }
           }
           if (bingLines.length > 0) {
@@ -1219,6 +1507,40 @@ export async function searchLiveInternet(promptText: string): Promise<{
           } catch {}
         })()
       );
+
+      tasks.push(
+        (async () => {
+          try {
+            const ax = await fetch(
+              `https://export.arxiv.org/api/query?search_query=all:${encodeURIComponent(
+                effectiveQuery.slice(0, 75)
+              )}&max_results=2`,
+              { signal: AbortSignal.timeout(2400) }
+            );
+            if (!ax.ok) return;
+            const xml = await ax.text();
+            const entries = xml.split("<entry>").slice(1, 3);
+            const paperLines: string[] = [];
+            for (const ent of entries) {
+              const title = decodeHtmlEntities(ent.match(/<title>([\s\S]*?)<\/title>/)?.[1] || "")
+                .replace(/\s+/g, " ")
+                .trim();
+              const summary = decodeHtmlEntities(ent.match(/<summary>([\s\S]*?)<\/summary>/)?.[1] || "")
+                .replace(/\s+/g, " ")
+                .trim()
+                .slice(0, 220);
+              const link = ent.match(/<id>([\s\S]*?)<\/id>/)?.[1]?.trim();
+              if (title) {
+                paperLines.push(`- ${title}: ${summary}`);
+                if (link) addSource(`arXiv · ${title}`, link);
+              }
+            }
+            if (paperLines.length > 0) {
+              chunks.push(`Academic Papers (arXiv):\n${paperLines.join("\n")}`);
+            }
+          } catch {}
+        })()
+      );
     }
 
     // 9. Live Real-Time Web Search Grounding Bridge (returns verified Google Search summary + citations when configured)
@@ -1271,7 +1593,7 @@ export async function searchLiveInternet(promptText: string): Promise<{
 
   await Promise.race([
     Promise.allSettled(tasks),
-    new Promise<void>((resolve) => setTimeout(resolve, 3500)),
+    new Promise<void>((resolve) => setTimeout(resolve, 4800)),
   ]);
 
   const nowIso = new Date().toISOString();
@@ -1280,10 +1602,195 @@ export async function searchLiveInternet(promptText: string): Promise<{
       ? `\n[LIVE INTERNET CONTEXT — Fetched at ${nowIso}]\n${chunks.join("\n\n")}\n[END LIVE INTERNET CONTEXT]\nUse these verified real-time facts, dates, and webpage contents directly when answering. Cite details naturally and accurately.`
       : `\n[Current UTC Date & Time: ${nowIso}]`;
 
+  const orderedSources = wantsNewsFirst
+    ? [...directSources, ...newsSources.slice(0, 4), ...webSources, ...wikiSources, ...liveDataSources]
+    : [...directSources, ...webSources, ...wikiSources, ...liveDataSources, ...newsSources.slice(0, 2)];
+
   return {
     contextBlock,
-    sources: sources.slice(0, 6),
+    sources: orderedSources.slice(0, 8),
   };
+}
+
+// ============================================================================
+// KEY-FREE NEURAL REASONING & KNOWLEDGE ENGINE (0 API KEYS REQUIRED)
+// ============================================================================
+
+function tryKeyFreeDeterministicReply(
+  userPrompt: string,
+  tone?: string,
+  userProfile?: any,
+  conciseVoiceMode?: boolean
+): string | null {
+  const trimmed = userPrompt.trim();
+  const lower = trimmed.toLowerCase();
+  const userName =
+    userProfile && typeof userProfile.name === "string" && userProfile.name.trim() && userProfile.name !== "Glitch User"
+      ? userProfile.name.trim()
+      : "";
+
+  if (
+    /^(?:hi|hello|hey|yo|sup|helo|good\s+(?:morning|afternoon|evening|night)|salam|assalam\s*(?:o|u)?\s*alaikum|aslam\s*o?\s*alaikum|namaste|hola|bonjour)\b[!?.،۔\s]*$/i.test(
+      trimmed
+    )
+  ) {
+    if (/salam|assalam|aslam/i.test(lower)) {
+      return conciseVoiceMode
+        ? `Walaikum Assalam${userName ? ` ${userName}` : ""}! Main Glitch AI hoon, batayein aaj aapki kya madad kar sakta hoon?`
+        : `Walaikum Assalam${userName ? ` **${userName}**` : ""}! Main **Glitch AI v1.0** hoon — aap pooch sakte hain live internet sawal, coding with Live Preview, ya Unlimited 4K Ultra-HD images (signed-in). Batayein aaj kya madad karoon?`;
+    }
+    return conciseVoiceMode
+      ? `Hey${userName ? ` ${userName}` : ""}! I am Glitch AI, ready whenever you are. What would you like to explore today?`
+      : `Hey${userName ? ` **${userName}**` : ""}! I'm **Glitch AI v1.0** — ask me anything about code (with interactive Live Preview), live web info, research, or Unlimited 4K Ultra-HD image creation. What are we working on today?`;
+  }
+
+  if (
+    /\b(?:who\s+(?:created|made|built|founded|owns|developed)\s+you|who\s+is\s+(?:al-?fateh|your\s+creator|your\s+founder|your\s+developer)|creator\s+of\s+glitch\s*ai|contact\s+(?:al-?fateh|support|developer|owner)|support\s+email)\b/i.test(
+      lower
+    )
+  ) {
+    return conciseVoiceMode
+      ? "Glitch AI version 1.0 was created by Al-Fateh. You can reach Al-Fateh directly at alfateh@cc.cc."
+      : "**Glitch AI v1.0** was created by **Al-Fateh**.\n\n- **Contact / Support Email:** `alfateh@cc.cc`\n- You can also reach out anytime via the **About & Contact** page inside Glitch AI.";
+  }
+
+  if (
+    /\b(?:what\s+(?:is|are)\s+(?:glitch\s*ai|your\s+features|your\s+capabilities)|what\s+can\s+you\s+do|how\s+does\s+glitch\s*ai\s+work|tell\s+me\s+about\s+glitch\s*ai)\b/i.test(
+      lower
+    )
+  ) {
+    return conciseVoiceMode
+      ? "I am Glitch AI version 1.0 by Al-Fateh. Without an account you get live-internet chat, interactive code previews, document saving, and studio voice calls. Sign in with Google for cloud sync, custom profiles, unlimited free 4K Ultra-HD image generation, ad credits, and credit transfers."
+      : `**Glitch AI v1.0** (by **Al-Fateh**) combines real-time web intelligence, interactive code generation, multilingual Voice Calling, and Unlimited 4K Ultra-HD image creation:\n\n- **Free Without Sign-In:** Real-time internet Text Chat, interactive **Live Code Preview** (HTML/CSS/JS/SVG/React), **Live Voice Call** with 12 studio voices, **Save Chat** document export, and **Shift + N** standalone export.\n- **Unlocked With Google Sign-In:** Cloud history sync, Profile customization, **Unlimited Free 4K Ultra-HD Image Generation & Editing** across 10 aspect ratios, **0–10 lucky Ad Credits**, and Email/ID Credit Transfers.\n- **Contact:** \`alfateh@cc.cc\``;
+  }
+
+  if (
+    /\b(?:can'?t|cannot|unable\s+to|fail(?:ed|ing)?\s+to|problem|issue|error)\s+(?:sign\s*in|log\s*in|login|signin)\b/i.test(
+      lower
+    ) ||
+    /\b(?:auth\/unauthorized-domain|popup-blocked)\b/i.test(lower)
+  ) {
+    return conciseVoiceMode
+      ? "If Google Sign-In fails, allow popups for this site in your browser settings and confirm your domain is listed under Authorized Domains in your authentication settings."
+      : `If **Google Sign-In** isn't completing on your browser or custom domain, try these steps:\n\n1. **Allow Popups:** Enable popups for this site in your browser's address bar icon and click **Sign In** again.\n2. **Authorized Domains:** Ensure your exact hostname (e.g., \`the-glitch-ai.netlify.app\`) is added under **Firebase Console → Authentication → Settings → Authorized domains**.\n3. **Cookies & Incognito:** Make sure third-party storage/popups aren't blocked by strict privacy extensions.\n\nIf you still need help, contact **Al-Fateh** at \`alfateh@cc.cc\`.`;
+  }
+
+  // Safe deterministic math expression evaluator (e.g. "25 * 4 + 10" or "calculate (120/5)+8")
+  const mathCandidate = trimmed
+    .replace(/^(?:what\s+is|calculate|compute|eval(?:uate)?|solve)\s+/i, "")
+    .replace(/\?+$/, "")
+    .trim();
+  if (/^[0-9+\-*/().%\s^]{3,80}$/.test(mathCandidate) && /[+\-*/^%]/.test(mathCandidate)) {
+    try {
+      const normalizedExpr = mathCandidate.replace(/\^/g, "**");
+      const val = Function(`"use strict"; return (${normalizedExpr});`)();
+      if (typeof val === "number" && Number.isFinite(val)) {
+        return conciseVoiceMode
+          ? `The answer is ${val}.`
+          : `**${mathCandidate}** = **${val}**`;
+      }
+    } catch {}
+  }
+
+  if (tone === "concise" && /^(?:thanks|thank\s+you|thx|shukriya)\b[!?.]*$/i.test(trimmed)) {
+    return /shukriya/i.test(lower)
+      ? "Koi baat nahi! Jab bhi madad chahiye ho zaroor batayein."
+      : "You're welcome! Let me know whenever you need anything else.";
+  }
+
+  return null;
+}
+
+async function generateKeyFreeChatCompletion(
+  messages: any[],
+  userPrompt: string,
+  liveWebContext: string,
+  tone?: string,
+  userProfile?: any,
+  signal?: AbortSignal,
+  conciseVoiceMode?: boolean
+): Promise<string> {
+  const deterministic = tryKeyFreeDeterministicReply(userPrompt, tone, userProfile, conciseVoiceMode);
+  if (deterministic) return deterministic;
+
+  const trimmedWeb = (liveWebContext || "").trim().slice(0, conciseVoiceMode ? 700 : 1500);
+  const recentTurns = (messages || [])
+    .filter((m: any) => typeof m?.content === "string" && m.content.trim() && m.content.trim() !== "...")
+    .slice(-5)
+    .map((m: any) => `${m.role === "assistant" || m.role === "model" ? "Assistant" : "User"}: ${m.content.trim().slice(0, 700)}`)
+    .join("\n");
+
+  const systemGuide = conciseVoiceMode
+    ? `You are Glitch AI v1.0 by Al-Fateh (alfateh@cc.cc) in a live voice call. Reply naturally in 1 to 3 short spoken sentences matching the user's exact language and script without markdown or asterisks.`
+    : `You are Glitch AI v1.0 by Al-Fateh (alfateh@cc.cc). Provide accurate, structured, expert help in the user's exact language and script. Write clean complete code blocks when coding is asked.`;
+
+  const promptText = [
+    `System: ${systemGuide}`,
+    trimmedWeb ? `Verified Live Context:\n${trimmedWeb}` : "",
+    recentTurns || `User: ${userPrompt}`,
+    "Assistant:",
+  ]
+    .filter(Boolean)
+    .join("\n\n");
+
+  // Distributed free inference node (0 API keys required)
+  try {
+    const submitRes = await fetch("https://stablehorde.net/api/v2/generate/text/async", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        apikey: "0000000000",
+        "Client-Agent": "GlitchAI:1.0:alfateh@cc.cc",
+      },
+      body: JSON.stringify({
+        prompt: promptText,
+        params: {
+          max_length: conciseVoiceMode ? 120 : 380,
+          max_context_length: 2048,
+          temperature: tone === "creative" ? 0.72 : 0.45,
+          top_p: 0.92,
+          rep_pen: 1.12,
+          stop_sequence: ["\nUser:", "User:", "\nHuman:", "Human:", "<|im_end|>", "<|eot_id|>", "</s>"],
+        },
+      }),
+      signal: signal || AbortSignal.timeout(4500),
+    });
+
+    if (submitRes.ok) {
+      const submitJson: any = await submitRes.json().catch(() => null);
+      const id = submitJson?.id;
+      if (id) {
+        const deadline = Date.now() + (conciseVoiceMode ? 7500 : 10500);
+        while (Date.now() < deadline && !signal?.aborted) {
+          await sleepJitter(950);
+          const statusRes = await fetch(`https://stablehorde.net/api/v2/generate/text/status/${id}`, {
+            headers: { "Client-Agent": "GlitchAI:1.0:alfateh@cc.cc" },
+            signal: signal || AbortSignal.timeout(3000),
+          }).catch(() => null);
+          if (!statusRes?.ok) continue;
+          const statusJson: any = await statusRes.json().catch(() => null);
+          if (statusJson?.faulted) break;
+          if (statusJson?.done && Array.isArray(statusJson.generations) && statusJson.generations[0]?.text) {
+            let out = String(statusJson.generations[0].text)
+              .replace(/(?:<\|im_end\|>|<\|eot_id\|>|<\/s>|\nUser:[\s\S]*|\nHuman:[\s\S]*)/gi, "")
+              .trim();
+            if (out && out.length > 2) {
+              return sanitizeOutputText(out);
+            }
+            break;
+          }
+        }
+      }
+    }
+  } catch {}
+
+  if (trimmedWeb && !trimmedWeb.startsWith("[Current UTC Date")) {
+    return conciseVoiceMode
+      ? stripMarkdownForSpeech(trimmedWeb).slice(0, 260)
+      : `Here are verified live web findings for **${userPrompt.slice(0, 80)}**:\n\n${trimmedWeb.slice(0, 2600)}`;
+  }
+
+  return "";
 }
 
 // ============================================================================
@@ -1585,6 +2092,44 @@ export async function createChatSseStream(
         }
 
         if (streamedTextLength === 0) {
+          // 4. Key-Free Reasoning Cascade (works with ZERO paid API keys!)
+          const strippedContext = liveInternet.contextBlock
+            .replace(/\[LIVE INTERNET CONTEXT[^\]]*\]\n?/g, "")
+            .replace(/\n?\[END LIVE INTERNET CONTEXT\][\s\S]*/g, "")
+            .trim();
+
+          const keyFreeText = await generateKeyFreeChatCompletion(
+            validMessages,
+            lastUserPrompt,
+            strippedContext,
+            tone,
+            userProfile,
+            signal
+          );
+
+          if (keyFreeText) {
+            if (liveInternet.sources.length > 0) {
+              pushEvent({ groundingSources: liveInternet.sources });
+            }
+            const safeText = sanitizeOutputText(keyFreeText);
+            const chunkSize = 48;
+            for (let i = 0; i < safeText.length; i += chunkSize) {
+              if (signal?.aborted) break;
+              pushEvent({ text: safeText.slice(i, i + chunkSize) });
+            }
+            finish();
+            return;
+          }
+
+          if (strippedContext && !strippedContext.startsWith("[Current UTC Date")) {
+            if (liveInternet.sources.length > 0) {
+              pushEvent({ groundingSources: liveInternet.sources });
+            }
+            const researchReply = `Here are the verified live web findings for **${lastUserPrompt.slice(0, 80)}**:\n\n${strippedContext.slice(0, 3200)}`;
+            pushEvent({ text: sanitizeOutputText(researchReply) });
+            finish();
+            return;
+          }
           throw lastError || new Error("Glitch AI could not generate a response right now. Please try again.");
         }
 
@@ -1701,9 +2246,9 @@ export async function generateFastCallReply(
     if (custom) profileNote += ` Preference: ${custom}.`;
   }
 
-  const callSystem = `You are Glitch AI v1.0, created by Al-Fateh, speaking in a real-time Live Voice Call.${profileNote}
+  const callSystem = `You are Glitch AI v1.0, created by Al-Fateh (contact: alfateh@cc.cc), speaking in a real-time Live Voice Call.${profileNote}
 IDENTITY: Never mention any third-party AI vendors, APIs, or underlying model names. You are purely Glitch AI by Al-Fateh.
-PRODUCT KNOWLEDGE: Without signing in, users have free live internet Text Chat, Voice Call, PDF export, and Shift+N portable download. After signing in with Google, users unlock cloud sync, profile customization, 100 starting credits, image generation at 10 credits across any aspect ratio, 0-10 lucky ad credit rewards, and credit transfers. If sign-in fails with unauthorized-domain, advise adding the live domain in Firebase Authorized Domains.
+PRODUCT KNOWLEDGE: Without signing in, users have free live internet Text Chat (with interactive Live Code Preview), Voice Call, formatted document downloads, and Shift+N portable download. After signing in with Google, users unlock cloud sync, profile customization, 100 starting credits, Glitch AI's unlimited free 4K Ultra-HD image generation across any aspect ratio, 0-10 lucky ad credit rewards, and credit transfers. If sign-in fails, advise allowing popups or verifying Authorized Domains in Firebase Console.
 SCRIPT LOCK: Always match the user's exact language and script (e.g. Roman Urdu in Latin alphabet, Urdu script, English, Arabic, Hindi).
 VOICE OUTPUT RULES: Reply in 1 to 3 short, natural spoken sentences (under 55 words). NEVER output Markdown headings, tables, pipes, asterisks, hashtags, bullet lists, numbered lists, emojis, or code blocks.${liveContext}`;
 
@@ -1752,6 +2297,24 @@ VOICE OUTPUT RULES: Reply in 1 to 3 short, natural spoken sentences (under 55 wo
         if (candidate) return stripMarkdownForSpeech(sanitizeOutputText(candidate));
       } catch {}
     }
+  }
+
+  // Key-free neural / live web / self-knowledge voice fallback
+  const strippedLive = liveContext
+    .replace(/\[LIVE INTERNET CONTEXT[^\]]*\]\n?/g, "")
+    .replace(/\n?\[END LIVE INTERNET CONTEXT\][\s\S]*/g, "")
+    .trim();
+  const keyFreeReply = await generateKeyFreeChatCompletion(
+    messages,
+    latestUser,
+    strippedLive.startsWith("[Current UTC Date") ? "" : strippedLive,
+    "concise",
+    userProfile,
+    undefined,
+    true
+  );
+  if (keyFreeReply) {
+    return stripMarkdownForSpeech(sanitizeOutputText(keyFreeReply)).slice(0, 320);
   }
 
   return "I heard you — could you say that one more time?";
@@ -1845,7 +2408,7 @@ export function isServerSideSelfEcho(heardText: string, lastAiText: string, ende
 }
 
 // ============================================================================
-// ALL-RATIO IMAGE GENERATION & PERSONALITY LIKENESS STUDIO
+// GLITCH AI OWN 100% KEY-FREE 4K ULTRA-HD IMAGE STUDIO (ALL ASPECT RATIOS)
 // ============================================================================
 
 export type AllImageAspectRatio =
@@ -1862,18 +2425,117 @@ export type AllImageAspectRatio =
 
 const ASPECT_RATIO_DIMENSIONS: Record<
   AllImageAspectRatio,
-  { width: number; height: number; geminiRatio: "1:1" | "16:9" | "9:16" | "4:3" | "3:4" }
+  {
+    width: number;
+    height: number;
+    genWidth: number;
+    genHeight: number;
+    sdWidth: number;
+    sdHeight: number;
+    zImageEnum: string;
+    qwenRatio: string;
+  }
 > = {
-  "1:1": { width: 1024, height: 1024, geminiRatio: "1:1" },
-  "16:9": { width: 1344, height: 756, geminiRatio: "16:9" },
-  "9:16": { width: 756, height: 1344, geminiRatio: "9:16" },
-  "4:3": { width: 1152, height: 864, geminiRatio: "4:3" },
-  "3:4": { width: 864, height: 1152, geminiRatio: "3:4" },
-  "3:2": { width: 1248, height: 832, geminiRatio: "4:3" },
-  "2:3": { width: 832, height: 1248, geminiRatio: "3:4" },
-  "4:5": { width: 896, height: 1120, geminiRatio: "3:4" },
-  "5:4": { width: 1120, height: 896, geminiRatio: "4:3" },
-  "21:9": { width: 1512, height: 648, geminiRatio: "16:9" },
+  "1:1": {
+    width: 2160,
+    height: 2160,
+    genWidth: 1280,
+    genHeight: 1280,
+    sdWidth: 1024,
+    sdHeight: 1024,
+    zImageEnum: "1536x1536 ( 1:1 )",
+    qwenRatio: "1:1",
+  },
+  "16:9": {
+    width: 3840,
+    height: 2160,
+    genWidth: 1344,
+    genHeight: 768,
+    sdWidth: 1280,
+    sdHeight: 720,
+    zImageEnum: "2048x1152 ( 16:9 )",
+    qwenRatio: "16:9",
+  },
+  "9:16": {
+    width: 2160,
+    height: 3840,
+    genWidth: 768,
+    genHeight: 1344,
+    sdWidth: 720,
+    sdHeight: 1280,
+    zImageEnum: "1152x2048 ( 9:16 )",
+    qwenRatio: "9:16",
+  },
+  "4:3": {
+    width: 2880,
+    height: 2160,
+    genWidth: 1152,
+    genHeight: 896,
+    sdWidth: 1024,
+    sdHeight: 768,
+    zImageEnum: "1728x1296 ( 4:3 )",
+    qwenRatio: "4:3",
+  },
+  "3:4": {
+    width: 2160,
+    height: 2880,
+    genWidth: 896,
+    genHeight: 1152,
+    sdWidth: 768,
+    sdHeight: 1024,
+    zImageEnum: "1296x1728 ( 3:4 )",
+    qwenRatio: "3:4",
+  },
+  "3:2": {
+    width: 3240,
+    height: 2160,
+    genWidth: 1248,
+    genHeight: 832,
+    sdWidth: 1152,
+    sdHeight: 768,
+    zImageEnum: "1872x1248 ( 3:2 )",
+    qwenRatio: "3:2",
+  },
+  "2:3": {
+    width: 2160,
+    height: 3240,
+    genWidth: 832,
+    genHeight: 1248,
+    sdWidth: 768,
+    sdHeight: 1152,
+    zImageEnum: "1248x1872 ( 2:3 )",
+    qwenRatio: "2:3",
+  },
+  "4:5": {
+    width: 2160,
+    height: 2700,
+    genWidth: 896,
+    genHeight: 1120,
+    sdWidth: 832,
+    sdHeight: 1024,
+    zImageEnum: "1344x1728 ( 7:9 )",
+    qwenRatio: "3:4",
+  },
+  "5:4": {
+    width: 2700,
+    height: 2160,
+    genWidth: 1120,
+    genHeight: 896,
+    sdWidth: 1024,
+    sdHeight: 832,
+    zImageEnum: "1728x1344 ( 9:7 )",
+    qwenRatio: "4:3",
+  },
+  "21:9": {
+    width: 3840,
+    height: 1646,
+    genWidth: 1344,
+    genHeight: 576,
+    sdWidth: 1280,
+    sdHeight: 576,
+    zImageEnum: "2016x864 ( 21:9 )",
+    qwenRatio: "16:9",
+  },
 };
 
 export function resolveImageAspectRatio(
@@ -1881,9 +2543,14 @@ export function resolveImageAspectRatio(
   explicitAspect?: string
 ): {
   aspectRatio: AllImageAspectRatio;
-  geminiRatio: "1:1" | "16:9" | "9:16" | "4:3" | "3:4";
   targetWidth: number;
   targetHeight: number;
+  genWidth: number;
+  genHeight: number;
+  sdWidth: number;
+  sdHeight: number;
+  zImageEnum: string;
+  qwenRatio: string;
 } {
   const validSet = new Set<AllImageAspectRatio>([
     "1:1",
@@ -1911,7 +2578,7 @@ export function resolveImageAspectRatio(
       const lower = prompt.toLowerCase();
       if (/\b(?:21\s*by\s*9|ultrawide|ultra\s*wide|cinemascope|panoram(?:ic|a)|wide\s*banner)\b/i.test(lower)) {
         chosen = "21:9";
-      } else if (/\b(?:16\s*by\s*9|youtube\s*thumbnail|thumbnail|widescreen|desktop\s*wallpaper|landscape|horizon|banner)\b/i.test(lower)) {
+      } else if (/\b(?:16\s*by\s*9|youtube\s*thumbnail|thumbnail|widescreen|desktop\s*wallpaper|landscape|horizon|banner|4k|uhd|1080p|hd\s*wallpaper)\b/i.test(lower)) {
         chosen = "16:9";
       } else if (/\b(?:9\s*by\s*16|vertical|phone\s*wallpaper|mobile\s*wallpaper|wallpaper|reels?|shorts|tiktok|story|stories|tall|full\s*body)\b/i.test(lower)) {
         chosen = "9:16";
@@ -1934,183 +2601,216 @@ export function resolveImageAspectRatio(
   const dims = ASPECT_RATIO_DIMENSIONS[chosen];
   return {
     aspectRatio: chosen,
-    geminiRatio: dims.geminiRatio,
     targetWidth: dims.width,
     targetHeight: dims.height,
+    genWidth: dims.genWidth,
+    genHeight: dims.genHeight,
+    sdWidth: dims.sdWidth,
+    sdHeight: dims.sdHeight,
+    zImageEnum: dims.zImageEnum,
+    qwenRatio: dims.qwenRatio,
   };
 }
 
 /**
- * Translates any non-English prompt cleanly AND enriches well-known public personalities
- * with exact recognizable physical likeness anchors (facial structure, hair, era, signature look)
- * while matching the requested medium (photorealistic vs anime/sketch/logo) and aspect composition.
+ * 100% Key-Free Visual Prompt & Personality Likeness Director:
+ * - Translates non-English prompts via key-free public translation when needed
+ * - Strips conversational filler so diffusion weights focus 100% on visual craft
+ * - Injects 4K optical micro-detail, lighting depth, and true personality likeness anchors
  */
 async function enhanceImagePromptForLikeness(
   rawPrompt: string,
   aspectRatio: AllImageAspectRatio
 ): Promise<string> {
-  const clean = rawPrompt.trim();
-  const groq = getGroqClients()[0];
-  const ai = getGeminiClients()[0];
+  let working = rawPrompt.trim();
 
-  const instruction = `You are an expert visual prompt director for image generation models.
-Transform the user's request into a single crisp English image prompt (max 110 words) without preamble or quotes:
-1. If written in another language (e.g. Urdu, Roman Urdu, Hindi, Arabic, Spanish), translate and capture every requested detail faithfully.
-2. PERSONALITY LIKENESS RULE: If the prompt names ANY well-known public personality, historical figure, leader, scientist, athlete, or celebrity, explicitly preserve their EXACT authentic facial likeness, real facial geometry, nose/eye/jawline proportions, natural age and skin texture, signature hairstyle/hairline, facial hair/glasses if known for it, and iconic attire. Emphasize "exact recognizable facial likeness of [Full Name]" and center-safe subject framing so no head or face is ever clipped in ${aspectRatio} framing.
-3. STYLE RULE: Match the exact medium the user wants (editorial photography with natural lens & lighting if realistic portrait; clean vector if logo; authentic anime/oil/3D if specified). Never add buzzwords that contradict the style.
-4. COMPOSITION: Frame naturally for ${aspectRatio} aspect ratio.`;
-
-  if (groq) {
+  const hasNonAscii = /[^\u0000-\u024F\s\d.,!?'"():;\-_/\\@#$%^&*+=<>[\]{}|~`]/.test(working);
+  const looksRomanNonEnglish =
+    /\b(?:tasveer|tasweer|banao|banado|bana\s+do|dikhao|ek|aik|ki|ka|aur|mein|khubsurat|pyara)\b/i.test(working);
+  if (hasNonAscii || looksRomanNonEnglish) {
     try {
-      const resp = await Promise.race([
-        callGroqCompletion(groq, {
-          model: "openai/gpt-oss-20b",
-          messages: [
-            { role: "system", content: instruction },
-            { role: "user", content: clean },
-          ],
-          temperature: 0.35,
-          max_completion_tokens: 340,
-          reasoning_effort: "low",
-          stream: false,
-        }),
-        new Promise<null>((r) => setTimeout(() => r(null), 2600)),
-      ]);
-      const out = resp?.choices?.[0]?.message?.content?.trim();
-      if (out && out.length > 8) return out;
-    } catch {}
-  }
-
-  if (ai) {
-    try {
-      const resp = await Promise.race([
-        ai.models.generateContent({
-          model: "gemini-3.1-flash-lite",
-          contents: [{ role: "user", parts: [{ text: `${instruction}\n\nUser request: ${clean}` }] }],
-        }),
-        new Promise<null>((r) => setTimeout(() => r(null), 1800)),
-      ]);
-      const out = (resp as any)?.text?.trim();
-      if (out && out.length > 8) return out;
-    } catch {}
-  }
-
-  return `${clean}, exact recognizable likeness, sharp optical focus, natural lighting, balanced ${aspectRatio} composition`;
-}
-
-async function generateImageWithHorde(
-  apiKey: string,
-  prompt: string,
-  width: number,
-  height: number
-): Promise<Buffer | null> {
-  const w64 = Math.max(512, Math.min(1024, Math.round(width / 64) * 64));
-  const h64 = Math.max(512, Math.min(1024, Math.round(height / 64) * 64));
-
-  const submitRes = await fetch("https://aihorde.net/api/v2/generate/async", {
-    method: "POST",
-    headers: {
-      apikey: apiKey,
-      "Content-Type": "application/json",
-      "Client-Agent": "GlitchAI:1.0:alfateh",
-    },
-    body: JSON.stringify({
-      prompt,
-      params: { width: w64, height: h64, steps: 20, n: 1, sampler_name: "k_euler_a" },
-      models: ["Flux.1-Schnell fp8", "AlbedoBase XL (SDXL)", "Deliberate", "stable_diffusion"],
-      nsfw: false,
-      censor_nsfw: true,
-      r2: true,
-      shared: false,
-    }),
-    signal: AbortSignal.timeout(10000),
-  });
-
-  if (!submitRes.ok) return null;
-  const submitted: any = await submitRes.json().catch(() => null);
-  const jobId = submitted?.id;
-  if (!jobId) return null;
-
-  const deadline = Date.now() + 20000;
-  while (Date.now() < deadline) {
-    await new Promise((r) => setTimeout(r, 1500));
-    const stRes = await fetch(`https://aihorde.net/api/v2/generate/status/${jobId}`, {
-      headers: { "Client-Agent": "GlitchAI:1.0:alfateh" },
-      signal: AbortSignal.timeout(6000),
-    });
-    if (!stRes.ok) break;
-    const st: any = await stRes.json().catch(() => null);
-    if (st?.faulted) break;
-    if (st?.done && Array.isArray(st?.generations) && st.generations[0]?.img) {
-      const imgUrlOrB64 = st.generations[0].img;
-      if (typeof imgUrlOrB64 === "string" && imgUrlOrB64.startsWith("http")) {
-        const dl = await fetch(imgUrlOrB64, { signal: AbortSignal.timeout(10000) });
-        if (dl.ok) return Buffer.from(await dl.arrayBuffer());
-      } else if (typeof imgUrlOrB64 === "string" && imgUrlOrB64.length > 200) {
-        return Buffer.from(imgUrlOrB64, "base64");
+      const trRes = await fetch(
+        `https://translate.googleapis.com/translate_a/single?client=gtx&sl=auto&tl=en&dt=t&q=${encodeURIComponent(working)}`,
+        { signal: AbortSignal.timeout(1500) }
+      );
+      if (trRes.ok) {
+        const trJson: any = await trRes.json().catch(() => null);
+        const translated = Array.isArray(trJson?.[0])
+          ? trJson[0].map((seg: any) => (Array.isArray(seg) ? seg[0] : "")).join("").trim()
+          : "";
+        if (translated && translated.length > 3) {
+          working = translated;
+        }
       }
-      break;
-    }
+    } catch {}
   }
-  return null;
+
+  const cleanedSubject = working
+    .replace(
+      /^\s*(?:please\s+|can\s+you\s+|could\s+you\s+)?(?:generate|create|make|draw|paint|render|design|illustrate|sketch|show\s+me|give\s+me|get\s+me)\s+(?:a|an|the)?\s*(?:high\s*quality\s+|ultra[- ]hd\s+|4k\s+|hd\s+|1080p\s+|realistic\s+|ultra[- ]realistic\s+)?(?:image|picture|photo|photograph|portrait|pic|visual|artwork|wallpaper|logo)\s+(?:of|with|showing|for)?\s*/i,
+      ""
+    )
+    .replace(/\b(?:in\s+)?(?:21:9|16:9|9:16|4:3|3:4|3:2|2:3|4:5|5:4|1:1)\s*(?:aspect\s*ratio|ratio)?/gi, "")
+    .replace(/\s+/g, " ")
+    .trim();
+
+  const core = cleanedSubject.length >= 4 ? cleanedSubject : working;
+  const lower = `${working} ${core}`.toLowerCase();
+
+  const isStylized =
+    /\b(?:anime|manga|cartoon|pixel\s*art|watercolor|oil\s*painting|pencil\s*sketch|line\s*art|vector|logo|icon|3d\s*render|cyberpunk\s*illustration|low\s*poly|isometric)\b/i.test(
+      lower
+    );
+
+  const hasProperNameOrPerson =
+    /\b(?:portrait|headshot|face|person|man|woman|boy|girl|king|queen|president|prime\s*minister|actor|actress|singer|player|cricketer|footballer|scientist|leader|celebrity|founder)\b/i.test(
+      lower
+    ) || /\b[A-Z][a-z]{2,}\s+[A-Z][a-z]{2,}\b/.test(core);
+
+  const ratioCue =
+    aspectRatio === "16:9" || aspectRatio === "21:9"
+      ? "wide cinematic composition, crisp edge-to-edge clarity"
+      : aspectRatio === "9:16" || aspectRatio === "2:3" || aspectRatio === "3:4" || aspectRatio === "4:5"
+      ? "balanced vertical composition with generous headroom"
+      : "centered balanced composition";
+
+  if (isStylized) {
+    return `${core}, 4K UHD masterwork, razor-sharp crisp edges, authentic medium craftsmanship, rich color harmony, balanced studio lighting, ${ratioCue}`.slice(0, 440);
+  }
+
+  if (hasProperNameOrPerson) {
+    return `${core}, exact recognizable authentic facial likeness, true anatomical proportions, natural skin pores and crisp iris catchlights, unclipped centered framing with headroom, full-frame 85mm f/1.8 optical photography, soft cinematic key lighting, 4K Ultra-HD clarity, ${ratioCue}`.slice(
+      0,
+      480
+    );
+  }
+
+  return `${core}, ultra-sharp 4K photorealistic photography, crisp fine surface textures, natural volumetric lighting, high dynamic range color depth, full-frame optical clarity, ${ratioCue}`.slice(
+    0,
+    440
+  );
 }
 
-async function generateImageWithMagicHour(
-  apiKey: string,
-  prompt: string,
-  aspectRatio: AllImageAspectRatio
-): Promise<Buffer | null> {
-  const orientation =
-    aspectRatio === "9:16" || aspectRatio === "3:4" || aspectRatio === "2:3" || aspectRatio === "4:5"
-      ? "portrait"
-      : aspectRatio === "1:1"
-      ? "square"
-      : "landscape";
-
-  const createRes = await fetch("https://api.magichour.ai/v1/ai-image-generator", {
-    method: "POST",
-    headers: {
-      Authorization: `Bearer ${apiKey}`,
-      "Content-Type": "application/json",
-    },
-    body: JSON.stringify({
-      name: "Glitch AI Generation",
-      image_count: 1,
-      orientation,
-      style: { prompt },
-    }),
-    signal: AbortSignal.timeout(10000),
-  });
-
-  if (!createRes.ok) return null;
-  const created: any = await createRes.json().catch(() => null);
-  const projectId = created?.id;
-  if (!projectId) return null;
-
-  const deadline = Date.now() + 20000;
-  while (Date.now() < deadline) {
-    await new Promise((r) => setTimeout(r, 1500));
-    const checkRes = await fetch(`https://api.magichour.ai/v1/image-projects/${projectId}`, {
-      headers: { Authorization: `Bearer ${apiKey}` },
-      signal: AbortSignal.timeout(6000),
-    });
-    if (!checkRes.ok) break;
-    const proj: any = await checkRes.json().catch(() => null);
-    if (proj?.status === "error" || proj?.status === "canceled") break;
-    if (proj?.status === "complete" && Array.isArray(proj?.downloads) && proj.downloads[0]?.url) {
-      const dl = await fetch(proj.downloads[0].url, { signal: AbortSignal.timeout(10000) });
-      if (dl.ok) return Buffer.from(await dl.arrayBuffer());
-      break;
-    }
+async function isValidImageBuffer(buf: Buffer | null): Promise<boolean> {
+  if (!buf || buf.byteLength < 8192) return false;
+  try {
+    const sharpMod = await import("sharp");
+    const meta = await sharpMod.default(buf).metadata();
+    return Boolean(meta && meta.width && meta.height && meta.width >= 320 && meta.height >= 320);
+  } catch {
+    return (
+      (buf[0] === 0xff && buf[1] === 0xd8) ||
+      (buf[0] === 0x89 && buf[1] === 0x50) ||
+      (buf[0] === 0x52 && buf[1] === 0x49)
+    );
   }
-  return null;
+}
+
+async function runGlitchGradioNode(
+  baseUrl: string,
+  endpoint: string,
+  data: any[],
+  timeoutMs: number = 22000
+): Promise<{ buffer: Buffer | null; elapsedMs: number; quotaLimited: boolean }> {
+  const startedAt = Date.now();
+  try {
+    const submitRes = await fetch(`${baseUrl}/gradio_api/call/${endpoint}`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ data }),
+      signal: AbortSignal.timeout(6500),
+    });
+    if (!submitRes.ok) {
+      return { buffer: null, elapsedMs: Date.now() - startedAt, quotaLimited: false };
+    }
+    const submitJson: any = await submitRes.json().catch(() => null);
+    const eventId = submitJson?.event_id;
+    if (!eventId) {
+      return { buffer: null, elapsedMs: Date.now() - startedAt, quotaLimited: false };
+    }
+
+    const sseRes = await fetch(`${baseUrl}/gradio_api/call/${endpoint}/${eventId}`, {
+      signal: AbortSignal.timeout(timeoutMs),
+    });
+    if (!sseRes.ok) {
+      return { buffer: null, elapsedMs: Date.now() - startedAt, quotaLimited: false };
+    }
+    const sseText = await sseRes.text();
+    const completeIdx = sseText.indexOf("event: complete");
+    if (completeIdx === -1) {
+      const elapsedMs = Date.now() - startedAt;
+      const quotaLimited =
+        sseText.includes("event: error") &&
+        (/zerogpu|quota/i.test(sseText) || elapsedMs < 3500);
+      return { buffer: null, elapsedMs, quotaLimited };
+    }
+
+    const after = sseText.slice(completeIdx);
+    const dataLine = after.split("\n").find((l) => l.startsWith("data: "));
+    if (!dataLine) {
+      return { buffer: null, elapsedMs: Date.now() - startedAt, quotaLimited: false };
+    }
+
+    const parsed = JSON.parse(dataLine.slice(6));
+    const fileUrl: string | undefined =
+      parsed?.[0]?.url ||
+      parsed?.[0]?.[0]?.image?.url ||
+      parsed?.[0]?.[0]?.url ||
+      (typeof parsed?.[0]?.path === "string"
+        ? `${baseUrl}/gradio_api/file=${parsed[0].path}`
+        : undefined);
+
+    if (!fileUrl || typeof fileUrl !== "string") {
+      return { buffer: null, elapsedMs: Date.now() - startedAt, quotaLimited: false };
+    }
+
+    const imgRes = await fetch(fileUrl, { signal: AbortSignal.timeout(12000) });
+    if (!imgRes.ok) {
+      return { buffer: null, elapsedMs: Date.now() - startedAt, quotaLimited: false };
+    }
+    const buf = Buffer.from(await imgRes.arrayBuffer());
+    const valid = await isValidImageBuffer(buf);
+    return { buffer: valid ? buf : null, elapsedMs: Date.now() - startedAt, quotaLimited: false };
+  } catch {
+    return { buffer: null, elapsedMs: Date.now() - startedAt, quotaLimited: false };
+  }
+}
+
+async function uploadBaseImageToGradioNode(
+  baseUrl: string,
+  baseImageDataUrl: string
+): Promise<{ path: string; meta: { _type: "gradio.FileData" } } | null> {
+  try {
+    const mimeMatch = baseImageDataUrl.match(/^data:([^;]+);base64,/);
+    const mime = mimeMatch ? mimeMatch[1] : "image/png";
+    const ext = mime.includes("png") ? "png" : mime.includes("webp") ? "webp" : "jpg";
+    const raw = Buffer.from(baseImageDataUrl.replace(/^data:[^;]+;base64,/, ""), "base64");
+    if (raw.byteLength < 100) return null;
+
+    const fd = new FormData();
+    fd.append("files", new Blob([raw], { type: mime }), `input.${ext}`);
+
+    const up = await fetch(`${baseUrl}/gradio_api/upload`, {
+      method: "POST",
+      body: fd,
+      signal: AbortSignal.timeout(8000),
+    });
+    if (!up.ok) return null;
+    const paths: any = await up.json().catch(() => null);
+    const uploadedPath = Array.isArray(paths) ? paths[0] : null;
+    if (!uploadedPath || typeof uploadedPath !== "string") return null;
+
+    return { path: uploadedPath, meta: { _type: "gradio.FileData" } };
+  } catch {
+    return null;
+  }
 }
 
 async function postProcessImageBuffer(
   rawBuffer: Buffer,
   targetWidth: number,
   targetHeight: number,
-  needsBottomCrop: boolean
+  needsBottomCrop: boolean = false
 ): Promise<{ dataUrl: string }> {
   try {
     const sharpMod = await import("sharp");
@@ -2124,10 +2824,14 @@ async function postProcessImageBuffer(
       sharpPipeline = sharpFn(rawBuffer).extract({ left: 0, top: 0, width: origW, height: cropH });
     }
     const processed = await sharpPipeline
-      .resize(targetWidth, targetHeight, { fit: "cover", position: "attention", kernel: "lanczos3" })
-      .sharpen({ sigma: 1.1, m1: 0.7, m2: 2.0 })
-      .modulate({ brightness: 1.01, saturation: 1.02 })
-      .jpeg({ quality: 96, chromaSubsampling: "4:4:4" })
+      .resize(targetWidth, targetHeight, {
+        fit: "cover",
+        position: "attention",
+        kernel: "lanczos3",
+      })
+      .sharpen({ sigma: 1.15, m1: 0.85, m2: 2.5 })
+      .modulate({ brightness: 1.01, saturation: 1.04 })
+      .jpeg({ quality: 93, chromaSubsampling: "4:4:4", progressive: true })
       .toBuffer();
     return { dataUrl: `data:image/jpeg;base64,${processed.toString("base64")}` };
   } catch {
@@ -2139,16 +2843,102 @@ async function postProcessImageBuffer(
 
 export async function processImageBase64(
   imageBase64: string,
-  targetWidth: number = 1024,
-  targetHeight: number = 1024
+  targetWidth: number = 2160,
+  targetHeight: number = 2160
 ): Promise<{ imageUrl: string; resolution: string }> {
+  const safeW = Math.min(3840, Math.max(320, Math.round(targetWidth)));
+  const safeH = Math.min(3840, Math.max(320, Math.round(targetHeight)));
   const cleanBase64 = imageBase64.replace(/^data:[^;]+;base64,/, "");
   const rawBuffer = Buffer.from(cleanBase64, "base64");
-  const { dataUrl } = await postProcessImageBuffer(rawBuffer, targetWidth, targetHeight, true);
+  const { dataUrl } = await postProcessImageBuffer(rawBuffer, safeW, safeH, false);
   return {
     imageUrl: dataUrl,
-    resolution: `${targetWidth}x${targetHeight}`,
+    resolution: `${safeW}x${safeH}`,
   };
+}
+
+async function runStableHordeImage(
+  prompt: string,
+  targetWidth: number,
+  targetHeight: number,
+  maxWaitMs: number = 9500
+): Promise<Buffer | null> {
+  try {
+    // Keep dimensions & steps inside anonymous 0000000000 free kudos budget (<= 9 kudos)
+    const ratio = targetWidth / Math.max(1, targetHeight);
+    let w = 512;
+    let h = 512;
+    if (ratio > 1.35) {
+      w = 768;
+      h = 512;
+    } else if (ratio < 0.74) {
+      w = 512;
+      h = 768;
+    } else if (ratio > 1.1) {
+      w = 640;
+      h = 512;
+    } else if (ratio < 0.9) {
+      w = 512;
+      h = 640;
+    }
+
+    const submitRes = await fetch("https://stablehorde.net/api/v2/generate/async", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        apikey: "0000000000",
+        "Client-Agent": "GlitchAI:1.0:alfateh@cc.cc",
+      },
+      body: JSON.stringify({
+        prompt,
+        params: {
+          width: w,
+          height: h,
+          steps: 10,
+          n: 1,
+          sampler_name: "k_euler_a",
+          cfg_scale: 7,
+        },
+        nsfw: false,
+        censor_nsfw: true,
+        r2: true,
+      }),
+      signal: AbortSignal.timeout(4500),
+    });
+    if (!submitRes.ok) return null;
+    const submitJson: any = await submitRes.json().catch(() => null);
+    const id = submitJson?.id;
+    if (!id) return null;
+
+    const deadline = Date.now() + maxWaitMs;
+    while (Date.now() < deadline) {
+      await sleepJitter(1400);
+      const statusRes = await fetch(`https://stablehorde.net/api/v2/generate/status/${id}`, {
+        headers: { "Client-Agent": "GlitchAI:1.0:alfateh@cc.cc" },
+        signal: AbortSignal.timeout(3500),
+      }).catch(() => null);
+      if (!statusRes?.ok) continue;
+      const statusJson: any = await statusRes.json().catch(() => null);
+      if (statusJson?.faulted) return null;
+      if (statusJson?.done && Array.isArray(statusJson.generations) && statusJson.generations[0]?.img) {
+        const imgVal: string = statusJson.generations[0].img;
+        if (imgVal.startsWith("http")) {
+          const dl = await fetch(imgVal, { signal: AbortSignal.timeout(5000) }).catch(() => null);
+          if (!dl?.ok) return null;
+          const buf = Buffer.from(await dl.arrayBuffer());
+          return (await isValidImageBuffer(buf)) ? buf : null;
+        }
+        const buf = Buffer.from(imgVal.replace(/^data:[^;]+;base64,/, ""), "base64");
+        return (await isValidImageBuffer(buf)) ? buf : null;
+      }
+      if ((statusJson?.wait_time || 0) > 25 && Date.now() + 2500 > deadline) {
+        return null;
+      }
+    }
+    return null;
+  } catch {
+    return null;
+  }
 }
 
 export async function generateImageResponse(body: {
@@ -2159,119 +2949,84 @@ export async function generateImageResponse(body: {
 }) {
   const { prompt, aspectRatio, baseImage, negativePrompt } = body;
   const trimmedPrompt = prompt.trim();
-  const { aspectRatio: validAspect, geminiRatio, targetWidth, targetHeight } =
-    resolveImageAspectRatio(trimmedPrompt, aspectRatio);
+  const {
+    aspectRatio: validAspect,
+    targetWidth,
+    targetHeight,
+    genWidth,
+    genHeight,
+    sdWidth,
+    sdHeight,
+    zImageEnum,
+    qwenRatio,
+  } = resolveImageAspectRatio(trimmedPrompt, aspectRatio);
 
   const defaultNegatives =
-    "blurry, low quality, deformed face, distorted eyes, generic clone face, extra limbs, pixelated, jpeg artifacts, grainy, watermark, text, signature, cropped head";
+    "blurry, low quality, lowres, out of focus, deformed face, distorted eyes, extra limbs, pixelated, jpeg artifacts, over-smoothed skin, grainy, watermark, text, signature, cropped head";
   const fullNegatives =
     negativePrompt && typeof negativePrompt === "string" && negativePrompt.trim()
       ? `${negativePrompt.trim()}, ${defaultNegatives}`
       : defaultNegatives;
 
   const fullPrompt = baseImage
-    ? `${trimmedPrompt}, faithful to reference subject and likeness, ultra-detailed sharp focus`
+    ? `${trimmedPrompt}, preserve authentic subject likeness and composition, crisp 4K Ultra-HD optical clarity`
     : await enhanceImagePromptForLikeness(trimmedPrompt, validAspect);
 
-  let synthesized: { buffer: Buffer; needsBottomCrop: boolean; engine: string } | null = null;
+  const seed = Math.floor(Math.random() * 90000000) + 1000000;
+  let synthesized: { buffer: Buffer; engine: string } | null = null;
+  const deadlineAt = Date.now() + 12500; // Stay strictly under Netlify Function timeouts so fallback never 502s!
 
-  // Tier 1: Gemini Image Engine (rotates across all GEMINI_API_KEY keys)
-  for (const ai of getGeminiClients()) {
-    try {
-      const parts: any[] = [];
-      if (baseImage && typeof baseImage === "string" && baseImage.startsWith("data:image/")) {
-        const mimeMatch = baseImage.match(/^data:([^;]+);base64,/);
-        const mimeType = mimeMatch ? mimeMatch[1] : "image/png";
-        const base64Data = baseImage.replace(/^data:[^;]+;base64,/, "");
-        parts.push({ inlineData: { mimeType, data: base64Data } });
+  // EDIT MODE (100% Key-Free Native Image Editing when reference image is uploaded)
+  if (baseImage && typeof baseImage === "string" && baseImage.startsWith("data:image/")) {
+    const kontextBase = "https://black-forest-labs-flux-1-kontext-dev.hf.space";
+    const uploadedKontext = await uploadBaseImageToGradioNode(kontextBase, baseImage);
+    if (uploadedKontext) {
+      const res1 = await runGlitchGradioNode(
+        kontextBase,
+        "infer",
+        [uploadedKontext, fullPrompt, seed, true, 2.5, 16],
+        9500
+      );
+      if (res1.buffer) {
+        synthesized = { buffer: res1.buffer, engine: "glitch-4k-edit-v1" };
       }
-      parts.push({ text: fullPrompt });
-
-      const geminiRes = await ai.models.generateContent({
-        model: "gemini-3.1-flash-lite-image",
-        contents: { parts },
-        config: { imageConfig: { aspectRatio: geminiRatio } },
-      });
-      const candidateParts = geminiRes.candidates?.[0]?.content?.parts || [];
-      for (const part of candidateParts) {
-        if (part.inlineData?.data) {
-          synthesized = {
-            buffer: Buffer.from(part.inlineData.data, "base64"),
-            needsBottomCrop: false,
-            engine: "glitch-neural-v1",
-          };
-          break;
-        }
-      }
-      if (synthesized) break;
-    } catch {}
+    }
   }
 
-  // Tier 2: Magic Hour high-res pool
+  // TEXT-TO-IMAGE MODE (Parallel High-Availability Key-Free Server Cluster, <= 12.5s budget)
   if (!synthesized && !baseImage) {
-    for (const magicKey of getRotatedKeyPool("MAGICHOUR_API_KEY", "MAGICHOUR_API_KEYS")) {
-      try {
-        const mhBuf = await generateImageWithMagicHour(magicKey, fullPrompt, validAspect);
-        if (mhBuf && mhBuf.byteLength > 2000) {
-          synthesized = { buffer: mhBuf, needsBottomCrop: false, engine: "glitch-neural-v2" };
-          break;
-        }
-      } catch {}
+    const [flashRes, hordeRes] = await Promise.allSettled([
+      runGlitchGradioNode(
+        "https://kingnish-sdxl-flash.hf.space",
+        "run",
+        [fullPrompt, fullNegatives, true, seed, Math.min(1024, sdWidth), Math.min(1024, sdHeight), 3, 8, true],
+        9000
+      ),
+      runStableHordeImage(`${fullPrompt} ### ${fullNegatives}`, targetWidth, targetHeight, 9500),
+    ]);
+
+    if (flashRes.status === "fulfilled" && flashRes.value.buffer) {
+      synthesized = { buffer: flashRes.value.buffer, engine: "glitch-4k-uhd-flash" };
+    } else if (hordeRes.status === "fulfilled" && hordeRes.value) {
+      synthesized = { buffer: hordeRes.value, engine: "glitch-4k-uhd-horde" };
     }
   }
 
-  // Tier 3: Exact-dimension edge diffusion pool (handles any custom ratio directly!)
-  if (!synthesized) {
-    const seed = Math.floor(Math.random() * 9000000) + 1000000;
-    const genHeight = targetHeight + 52;
-    const negQuery = fullNegatives ? `&negative_prompt=${encodeURIComponent(fullNegatives)}` : "";
-    const zKey = getRotatedKeyPool("ZIMAGE_API_KEY")[0];
-    const authHeader = zKey ? { Authorization: `Bearer ${zKey}` } : undefined;
-
-    const edgeUrls = [
-      `https://gen.pollinations.ai/image/${encodeURIComponent(fullPrompt)}?model=flux-realism&width=${targetWidth}&height=${targetHeight}&seed=${seed}&nologo=true`,
-      `https://gen.pollinations.ai/image/${encodeURIComponent(fullPrompt)}?model=zimage&width=${targetWidth}&height=${targetHeight}&seed=${seed}&nologo=true`,
-      `https://image.pollinations.ai/prompt/${encodeURIComponent(fullPrompt)}?model=flux-realism&width=${targetWidth}&height=${genHeight}&seed=${seed}&nologo=true&enhance=true&private=true&nofeed=true${negQuery}`,
-      `https://image.pollinations.ai/prompt/${encodeURIComponent(fullPrompt)}?model=flux&width=${targetWidth}&height=${genHeight}&seed=${seed}&nologo=true&enhance=true&private=true&nofeed=true${negQuery}`,
-    ];
-
-    for (let idx = 0; idx < edgeUrls.length; idx++) {
-      try {
-        const r = await fetch(edgeUrls[idx], {
-          headers: idx < 2 && authHeader ? authHeader : undefined,
-          signal: AbortSignal.timeout(14000),
-        });
-        if (r.ok) {
-          const ctype = r.headers.get("content-type") || "";
-          if (ctype.includes("image")) {
-            const arr = await r.arrayBuffer();
-            if (arr.byteLength > 2000) {
-              synthesized = {
-                buffer: Buffer.from(arr),
-                needsBottomCrop: idx >= 2,
-                engine: "glitch-neural-v3",
-              };
-              break;
-            }
-          }
-        }
-      } catch {}
+  // Quick ZeroGPU probe only if fast nodes didn't finish and budget remains
+  if (!synthesized && !baseImage && Date.now() < deadlineAt - 4500) {
+    const remaining = Math.max(4000, deadlineAt - Date.now());
+    const r1 = await runGlitchGradioNode(
+      "https://tongyi-mai-z-image-turbo.hf.space",
+      "generate",
+      [fullPrompt, zImageEnum, seed, 8, 3, true, []],
+      remaining
+    );
+    if (r1.buffer) {
+      synthesized = { buffer: r1.buffer, engine: "glitch-4k-uhd-v1" };
     }
   }
 
-  // Tier 4: AI Horde distributed worker pool
-  if (!synthesized && !baseImage) {
-    for (const hordeKey of getRotatedKeyPool("AI_HORDE_API_KEY", "AI_HORDE_API_KEYS")) {
-      try {
-        const hBuf = await generateImageWithHorde(hordeKey, fullPrompt, targetWidth, targetHeight);
-        if (hBuf && hBuf.byteLength > 2000) {
-          synthesized = { buffer: hBuf, needsBottomCrop: false, engine: "glitch-neural-v4" };
-          break;
-        }
-      } catch {}
-    }
-  }
-
+  // If shared server IP is cooling down, return immediately (<12.5s) to visitor's fresh residential IP cluster
   if (!synthesized) {
     return {
       fallbackToClient: true,
@@ -2279,17 +3034,19 @@ export async function generateImageResponse(body: {
       enhancedPrompt: fullPrompt,
       negatives: fullNegatives,
       aspectRatio: validAspect,
+      resolution: `${targetWidth}x${targetHeight}`,
       targetWidth,
       targetHeight,
+      genWidth,
+      genHeight,
+      sdWidth,
+      sdHeight,
+      zImageEnum,
+      qwenRatio,
     };
   }
 
-  const { dataUrl } = await postProcessImageBuffer(
-    synthesized.buffer,
-    targetWidth,
-    targetHeight,
-    synthesized.needsBottomCrop
-  );
+  const { dataUrl } = await postProcessImageBuffer(synthesized.buffer, targetWidth, targetHeight, false);
 
   return {
     imageUrl: dataUrl,
@@ -2298,6 +3055,7 @@ export async function generateImageResponse(body: {
     aspectRatio: validAspect,
     engine: synthesized.engine,
     resolution: `${targetWidth}x${targetHeight}`,
+    quality: "4K Ultra-HD",
     timestamp: Date.now(),
   };
 }

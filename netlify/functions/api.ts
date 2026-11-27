@@ -281,14 +281,14 @@ export default async function handler(req: Request): Promise<Response> {
   // POST /api/process-image
   if (req.method === "POST" && pathname === "/api/process-image") {
     try {
-      const { imageBase64, targetWidth = 1024, targetHeight = 1024 } = await readJsonBody(req);
+      const { imageBase64, targetWidth = 2160, targetHeight = 2160 } = await readJsonBody(req);
       if (!imageBase64 || typeof imageBase64 !== "string") {
         return jsonResponse({ error: "Missing imageBase64 payload" }, 400);
       }
       const result = await processImageBase64(
         imageBase64,
-        Number(targetWidth) || 1024,
-        Number(targetHeight) || 1024
+        Number(targetWidth) || 2160,
+        Number(targetHeight) || 2160
       );
       return jsonResponse(result);
     } catch (err: any) {

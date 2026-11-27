@@ -27,13 +27,13 @@ import {
   signInWithGoogle,
   logOut,
   onAuthChange,
+  consumePendingRedirectError,
   ensureCloudUserAccount,
   subscribeToUserProfile,
   saveCloudUserProfile,
   fetchCloudSessions,
   saveCloudSession,
   deleteCloudSession,
-  deductUserCredits,
   awardAdCredits,
   transferCreditsToUser,
   subscribeToIncomingTransfers,
@@ -43,8 +43,6 @@ import {
 import {
   GLITCH_AI_VERSION,
   INITIAL_CREDITS,
-  IMAGE_CREDIT_COST,
-  AD_REWARD_MAX,
   rollLuckyAdReward,
   getGuestCredits,
   earnGuestCredits,
@@ -97,10 +95,12 @@ function formatFriendlyErrorMessage(err: any): string {
   }
 
   if (
-    msg.includes('503') ||
-    msg.includes('high demand') ||
-    msg.includes('UNAVAILABLE') ||
-    msg.includes('Service Unavailable')
+    !msg.includes('No Credits were deducted') &&
+    !msg.includes('no Credits were deducted') &&
+    (msg.includes('503') ||
+      msg.includes('high demand') ||
+      msg.includes('UNAVAILABLE') ||
+      msg.includes('Service Unavailable'))
   ) {
     return 'Glitch AI servers are experiencing a brief surge in traffic. Click Retry Generation below to continue.';
   }
@@ -112,6 +112,111 @@ function formatFriendlyErrorMessage(err: any): string {
   return msg;
 }
 
+function formatGeneratedImageCaption(
+  aspectRatio: string | undefined,
+  resLabel: string
+): string {
+  const ratioPart = aspectRatio ? `${aspectRatio} · ` : '';
+  const highlights = [
+    `Here is your **4K Ultra-HD** creation (**${ratioPart}${resLabel}**), rendered with rich lighting, crisp fine detail, and balanced depth.`,
+    `Your **4K Ultra-HD** visual (**${ratioPart}${resLabel}**) is ready — crafted with sharp focus, natural color depth, and studio composition.`,
+    `Crafted in **4K Ultra-HD** (**${ratioPart}${resLabel}**) with high-definition texture, atmospheric lighting, and clean framing.`,
+    `Delivered in **4K Ultra-HD** (**${ratioPart}${resLabel}**) with crisp clarity, lifelike tones, and refined visual contrast.`,
+  ];
+  const chosen = highlights[Math.floor(Math.random() * highlights.length)];
+  return `${chosen}\n\n*(Unlimited 4K Ultra-HD · Free)*`;
+}
+
+function resolveClientAspectFallback(prompt: string): {
+  aspectRatio: string;
+  targetWidth: number;
+  targetHeight: number;
+  genWidth: number;
+  genHeight: number;
+  sdWidth: number;
+  sdHeight: number;
+  zImageEnum: string;
+  qwenRatio: string;
+} {
+  const lower = prompt.toLowerCase();
+  if (/\b21:9\b|\bultrawide\b|\bpanoram/i.test(lower)) {
+    return {
+      aspectRatio: '21:9',
+      targetWidth: 3840,
+      targetHeight: 1646,
+      genWidth: 1344,
+      genHeight: 576,
+      sdWidth: 1280,
+      sdHeight: 544,
+      zImageEnum: '2048x896 ( 21:9 )',
+      qwenRatio: '16:9',
+    };
+  }
+  if (/\b16:9\b|\blandscape\b|\byoutube\s*thumbnail\b|\bdesktop\s*wallpaper\b|\bwidescreen\b/i.test(lower)) {
+    return {
+      aspectRatio: '16:9',
+      targetWidth: 3840,
+      targetHeight: 2160,
+      genWidth: 1344,
+      genHeight: 768,
+      sdWidth: 1280,
+      sdHeight: 720,
+      zImageEnum: '2048x1152 ( 16:9 )',
+      qwenRatio: '16:9',
+    };
+  }
+  if (/\b9:16\b|\breels?\b|\btiktok\b|\bshorts\b|\bmobile\s*wallpaper\b|\bphone\s*wallpaper\b|\bvertical\b|\bstory\b/i.test(lower)) {
+    return {
+      aspectRatio: '9:16',
+      targetWidth: 2160,
+      targetHeight: 3840,
+      genWidth: 768,
+      genHeight: 1344,
+      sdWidth: 720,
+      sdHeight: 1280,
+      zImageEnum: '1152x2048 ( 9:16 )',
+      qwenRatio: '9:16',
+    };
+  }
+  if (/\b4:3\b|\bclassic\b/i.test(lower)) {
+    return {
+      aspectRatio: '4:3',
+      targetWidth: 2880,
+      targetHeight: 2160,
+      genWidth: 1152,
+      genHeight: 896,
+      sdWidth: 1024,
+      sdHeight: 768,
+      zImageEnum: '1728x1296 ( 4:3 )',
+      qwenRatio: '4:3',
+    };
+  }
+  if (/\b3:4\b|\b4:5\b|\bportrait\b|\binstagram\b/i.test(lower)) {
+    return {
+      aspectRatio: '3:4',
+      targetWidth: 2160,
+      targetHeight: 2880,
+      genWidth: 896,
+      genHeight: 1152,
+      sdWidth: 768,
+      sdHeight: 1024,
+      zImageEnum: '1296x1728 ( 3:4 )',
+      qwenRatio: '3:4',
+    };
+  }
+  return {
+    aspectRatio: '1:1',
+    targetWidth: 2160,
+    targetHeight: 2160,
+    genWidth: 1280,
+    genHeight: 1280,
+    sdWidth: 1024,
+    sdHeight: 1024,
+    zImageEnum: '1536x1536 ( 1:1 )',
+    qwenRatio: '1:1',
+  };
+}
+
 function inferExecutionMode(
   text: string,
   explicitMode?: ChatComposerMode,
@@ -121,58 +226,98 @@ function inferExecutionMode(
     return explicitMode;
   }
   const trimmed = text.trim();
+  const lower = trimmed.toLowerCase();
 
-  // Never hijack coding, programming, writing, or theoretical questions into media generation
-  const isCodeOrExplainQuery =
-    /^\s*(?:how\s+to\s+(?:code|build|implement|write)|what\s+is\s+|why\s+|explain\s+|define\s+|(?:write|create|make|build|generate)\s+(?:a|an|me\s+a)?\s*(?:code|script|function|program|html|css|js|ts|react|python|sql|app|website|component|page|plan|table|list|email|essay|summary|resume)|fix\s+this|debug\b|kaise\s+(?:code|kaam|chalta)|kya\s+hai\b|samjhao\b)/i.test(
-      trimmed
-    );
-  if (isCodeOrExplainQuery) {
+  // 1. Explicit meta-talk, negation, debugging, or coding/web discussion NEVER triggers image generation
+  if (
+    /\b(?:don'?t|do\s+not|stop|avoid|never|not\s+asking(?:\s+you)?\s+to|without)\s+(?:generate|generating|create|creating|make|making|draw|drawing|render|rendering)\s+(?:an?\s+|the\s+)?(?:image|pic|picture|photo|visual|artwork)\b/i.test(
+      lower
+    ) ||
+    /\b(?:mention(?:ed|ing)?|say(?:ing)?|type|typed|typing|word)\s+["']?(?:image|pic|picture|photo|logo|drawing)["']?/i.test(
+      lower
+    ) ||
+    /\b(?:image\s+generation|your\s+image|img\s+tag|<\s*img\b|background-image|image\s+(?:url|src|path|slider|carousel|gallery|uploader|upload|viewer|compression|resizer|format|quality|resolution|error|bug|issue)|profile\s+pic\s+code)\b/i.test(
+      lower
+    )
+  ) {
     return 'chat';
   }
 
-  // Video generation intent (Coming Soon notice)
-  if (
-    /\b(?:generate|create|make|render|produce|synthesize|animate|banao)\s+(?:me\s+)?(?:a|an|the|ek)?\s*(?:\S+\s+){0,5}(?:video|animation|clip|movie|film|reel)\b/i.test(
+  const isTechCodeOrQuestion =
+    /^\s*(?:how\s+(?:to|do\s+i|can\s+i|does)|what\s+(?:is|are|does|do)|why\s+(?:is|are|does|do|did|was)|when\s+(?:should|to)|where\s+(?:can|do|is)|which\s+(?:image|photo|pic|format|tool|one)|explain\b|define\b|describe\b|compare\b|fix\s+(?:this|my|the)\b|debug\b|troubleshoot\b|review\b|refactor\b|kaise\b|kya\s+hai\b|kyun\b|samjhao\b|batao\b)/i.test(
       trimmed
     ) ||
-    (hasImage && /\b(?:animate(?:\s+this)?|turn\s+this\s+into\s+a\s+video|make\s+a\s+video)\b/i.test(trimmed))
+    /\b(?:html|css|scss|tailwind|javascript|typescript|react|next\.?js|vue|svelte|python|java|node|express|sql|api|json|base64|svg\s+code|component|function|class|script|program|database|regex|algorithm|error\s+in|bug\s+in)\b/i.test(
+      lower
+    );
+
+  if (isTechCodeOrQuestion) {
+    return 'chat';
+  }
+
+  // 2. If user attached a reference image, default to Vision Chat unless they give an explicit visual edit or animation command
+  if (hasImage) {
+    if (/\b(?:animate(?:\s+this)?|turn\s+this\s+into\s+a\s+video|make\s+a\s+video)\b/i.test(lower)) {
+      return 'video';
+    }
+    if (
+      /\b(?:edit\s+this(?:\s+(?:image|photo|pic|picture))?|reimagine\s+this|remix\s+this|turn\s+(?:this|it)\s+into|change\s+the\s+background|remove\s+the\s+background|replace\s+the\b|restyle\s+this|make\s+(?:this|it)\s+look\s+like|background\s+change|badal\s+do)\b/i.test(
+        lower
+      )
+    ) {
+      return 'image';
+    }
+    return 'chat';
+  }
+
+  // 3. Video generation intent (Coming Soon notice)
+  if (
+    /^\s*(?:please\s+|can\s+you\s+|could\s+you\s+)?(?:generate|create|make|render|produce|synthesize|animate|banao)\s+(?:me\s+)?(?:a|an|the|ek)?\s*(?:\S+\s+){0,5}(?:video|animation|clip|movie|film|reel)\b/i.test(
+      trimmed
+    )
   ) {
     return 'video';
   }
 
-  // Rich multilingual & natural-language image generation / portrait / editing intent
+  // 4. Genuine direct image creation directives only (never casual conversation mentions)
   const mediaNouns =
-    '(?:image|images|pic|pics|picture|pictures|photo|photos|photograph|portrait|selfie|headshot|logo|logos|illustration|artwork|wallpaper|poster|posters|thumbnail|banner|avatar|pfp|icon|drawing|sketch|painting|caricature|tasveer|tasweer)';
+    '(?:image|images|pic|pics|picture|pictures|photo|photos|photograph|portrait|selfie|headshot|logo|logos|illustration|artwork|wallpaper|poster|posters|thumbnail|banner|avatar|pfp|caricature|drawing|sketch|painting|tasveer|tasweer)';
+  const nonVisualFollower =
+    '(?!\\s+(?:generation|generator|feature|system|quality|issue|bug|error|problem|tag|url|src|path|code|component|slider|carousel|gallery|upload|uploader|viewer|format|compression|extension|prompt|prompts))';
   const creationVerbs =
-    '(?:generate|create|make|draw|paint|render|design|illustrate|sketch|imagine|visualize|produce|show\\s+me|give\\s+me|get\\s+me|banao|banado|bana\\s+do|dikhao|tayyar\\s+karo)';
-  const imageVerbNounRegex = new RegExp(
-    `\\b${creationVerbs}\\s+(?:me\\s+)?(?:a|an|the|ek|aik)?\\s*(?:\\S+\\s+){0,6}${mediaNouns}\\b`,
+    '(?:generate|create|make|draw|paint|render|design|illustrate|sketch|imagine|visualize|banao|banado|bana\\s+do|tayyar\\s+karo)';
+
+  const directCommandRegex = new RegExp(
+    `^\\s*(?:please\\s+|plz\\s+|pls\\s+|can\\s+you\\s+|could\\s+you\\s+|would\\s+you\\s+|i\\s+want\\s+you\\s+to\\s+|i\\s+need\\s+you\\s+to\\s+)?${creationVerbs}\\s+(?:me\\s+)?(?:a|an|the|ek|aik)?\\s*(?:\\S+\\s+){0,6}${mediaNouns}${nonVisualFollower}(?:\\s+(?:of|with|showing|featuring|for|in|style|looking|wearing|standing|sitting|at|on|under|from|ki|ka)\\b|\\s*$)`,
+    'i'
+  );
+  const directShowMeVisualRegex = new RegExp(
+    `^\\s*(?:show\\s+me|give\\s+me|get\\s+me)\\s+(?:a|an|the|ek)?\\s*(?:realistic|photorealistic|hyperrealistic|ultra[-\\s]?realistic|4k|8k|hd|cinematic|anime|3d|cartoon|minimalist|custom|new)?\\s*${mediaNouns}${nonVisualFollower}\\s+(?:of|for|featuring|showing)\\b`,
     'i'
   );
   const nounThenUrduVerbRegex = new RegExp(
-    `\\b${mediaNouns}\\b[\\s\\S]{0,40}\\b(?:banao|banado|bana\\s+do|chahiye|generate|create)\\b`,
+    `\\b${mediaNouns}${nonVisualFollower}[\\s\\S]{0,40}\\b(?:banao|banado|bana\\s+do|banani\\s+hai|generate\\s+karo|create\\s+karo)\\b`,
     'i'
   );
-  const directVisualNounRegex = new RegExp(
-    `^\\s*(?:an?\\s+)?(?:realistic|photorealistic|hyperrealistic|ultra[-\\s]?realistic|8k|4k|cinematic|anime|3d|cartoon|oil\\s+painting|pencil|watercolor|21:9|16:9|9:16|4:3|3:4|3:2|2:3|4:5|5:4|1:1)?\\s*${mediaNouns}\\s+(?:of|with|showing|featuring|for|in|ki|ka)\\b`,
-    'i'
-  );
+  const directArtVerbRegex =
+    /^\s*(?:draw|paint|sketch|illustrate)\s+(?:me\s+)?(?:a|an|the|ek)?\s*(?!(?:diagram\s+of\s+how|chart\s+of\s+code|conclusion|attention|comparisons?|out\s+(?:a|an)\s+(?:plan|roadmap|architecture|system|flow)))[a-z0-9\u0600-\u06FF\u0900-\u097F]/i;
+
+  const trimmedNoQuestion = trimmed.replace(/[?!.]+$/, '');
+  const looksLikeGeneralQuestion =
+    trimmed.endsWith('?') &&
+    !/^\s*(?:can|could|would|will)\s+you\s+(?:please\s+)?(?:generate|create|make|draw|paint|render|design|illustrate|sketch)\b/i.test(
+      trimmed
+    );
 
   if (
-    imageVerbNounRegex.test(trimmed) ||
-    nounThenUrduVerbRegex.test(trimmed) ||
-    directVisualNounRegex.test(trimmed) ||
-    /^\s*(?:draw|paint|sketch|illustrate|imagine|render)\s+(?:me\s+)?(?!(?:a\s+)?(?:diagram\s+of\s+how|chart\s+of\s+code))/i.test(
-      trimmed
-    ) ||
-    (trimmed.length < 180 &&
-      /\b(?:21:9|16:9|9:16|4:5|5:4|3:2|2:3)\b/i.test(trimmed) &&
-      new RegExp(`\\b${mediaNouns}|${creationVerbs}\\b`, 'i').test(trimmed)) ||
-    (hasImage &&
-      /\b(?:edit\s+this|reimagine|remix|turn\s+this\s+into|change\s+the\s+background|style\s+this|make\s+this|background\s+change|badal\s+do)\b/i.test(
-        trimmed
-      ))
+    !looksLikeGeneralQuestion &&
+    (directCommandRegex.test(trimmedNoQuestion) ||
+      directShowMeVisualRegex.test(trimmedNoQuestion) ||
+      nounThenUrduVerbRegex.test(trimmedNoQuestion) ||
+      directArtVerbRegex.test(trimmedNoQuestion) ||
+      (trimmed.length < 160 &&
+        /\b(?:21:9|16:9|9:16|4:5|5:4|3:2|2:3)\b/i.test(trimmed) &&
+        new RegExp(`\\b${mediaNouns}${nonVisualFollower}\\b`, 'i').test(trimmed)))
   ) {
     return 'image';
   }
@@ -364,6 +509,18 @@ export default function App() {
     let unsubscribeTransfers: (() => void) | null = null;
     let isDisposed = false;
 
+    const pendingErr = consumePendingRedirectError();
+    if (pendingErr) {
+      if (pendingErr?.code === 'auth/unauthorized-domain') {
+        const host = typeof window !== 'undefined' ? window.location.hostname : 'this domain';
+        setAuthNotice(
+          `Add "${host}" under Firebase Console -> Authentication -> Settings -> Authorized domains to enable Google Sign-In.`
+        );
+      } else {
+        setAuthNotice('Google Sign-In could not finish: ' + (pendingErr?.message || 'Please try again.'));
+      }
+    }
+
     const unsubscribeAuth = onAuthChange(async (user) => {
       if (unsubscribeProfile) {
         unsubscribeProfile();
@@ -379,6 +536,15 @@ export default function App() {
       if (user) {
         wasSignedInRef.current = true;
         setAuthNotice(null);
+        setUserProfile((prev) => ({
+          ...prev,
+          name:
+            prev.name === 'Glitch User' || !prev.name
+              ? user.displayName || prev.name
+              : prev.name,
+          email: user.email || prev.email || '',
+          customAvatar: prev.customAvatar || user.photoURL || '',
+        }));
         setIsSyncing(true);
         const initPromise = (async () => {
           try {
@@ -459,8 +625,13 @@ export default function App() {
                 setActiveSessionId(fresh.id);
               }
             }
-          } catch (e) {
+          } catch (e: any) {
             console.error('Error synchronizing account on auth:', e);
+            if (!isDisposed) {
+              setAuthNotice(
+                `Signed in as ${user.email || 'Google user'}, but cloud sync hit an error: ${e?.message || 'Check Firestore rules or connection.'}`
+              );
+            }
           } finally {
             if (!isDisposed) setIsSyncing(false);
           }
@@ -648,7 +819,15 @@ export default function App() {
         setAuthNotice(
           `Add "${host}" under Firebase Console -> Authentication -> Settings -> Authorized domains to enable Google Sign-In on this domain.`
         );
-      } else if (err?.code !== 'auth/popup-closed-by-user') {
+      } else if (err?.code === 'auth/popup-blocked') {
+        setAuthNotice(
+          'Your browser blocked the Google Sign-In popup. Please allow popups for this site in your address bar and click Sign In again.'
+        );
+      } else if (err?.code === 'auth/popup-closed-by-user') {
+        setAuthNotice('Sign-in popup was closed before finishing. Click Sign In to try again.');
+      } else if (err?.code === 'auth/cancelled-popup-request') {
+        setAuthNotice('A previous sign-in window was still open. Please click Sign In once more.');
+      } else {
         setAuthNotice('Could not sign in with Google: ' + (err?.message || 'Please try again.'));
       }
     }
@@ -791,7 +970,7 @@ export default function App() {
       isStreaming: !isImageMode && effectiveMode !== 'video',
       isGeneratingMedia: isImageMode && !requiresAuthForImage,
       mediaType: isImageMode && !requiresAuthForImage ? 'image' : undefined,
-      mediaProgressLabel: isImageMode && !requiresAuthForImage ? 'Synthesizing high-resolution image...' : undefined,
+      mediaProgressLabel: isImageMode && !requiresAuthForImage ? 'Rendering 4K Ultra-HD artwork...' : undefined,
     };
 
     const baseHistory = (customHistory || activeSession.messages).filter(
@@ -843,7 +1022,7 @@ export default function App() {
       // 1. VIDEO GENERATION (COMING SOON IN FUTURE VERSION)
       if (effectiveMode === 'video') {
         const mediaDetail = currentUser
-          ? `Right now, you can continue using **Chat**, **Live Voice Call**, and **Image Generation** (${IMAGE_CREDIT_COST} Credits per image).`
+          ? `Right now, you can continue using **Chat**, **Live Voice Call**, and **Unlimited 4K Ultra-HD Image Generation** (Free).`
           : `Right now, you can continue using **Chat** and **Live Voice Call**.`;
         const comingSoonMessage: ChatMessage = {
           id: botMessageId,
@@ -859,13 +1038,13 @@ export default function App() {
         return;
       }
 
-      // 2. INLINE IMAGE GENERATION (REQUIRES GOOGLE SIGN-IN + 10 CREDITS)
+      // 2. UNLIMITED FREE 4K ULTRA-HD IMAGE GENERATION (REQUIRES GOOGLE SIGN-IN, 0 CREDITS)
       if (effectiveMode === 'image') {
         if (!currentUser) {
           const signInRequiredMsg: ChatMessage = {
             id: botMessageId,
             role: 'assistant',
-            content: `**Sign In Required**\n\nPlease sign in with your Google account to create or edit images.`,
+            content: `**Sign In Required**\n\nPlease sign in with your Google account to unlock Unlimited Free 4K Ultra-HD Image Generation and editing.`,
             timestamp: Date.now(),
             isStreaming: false,
             isGeneratingMedia: false,
@@ -876,74 +1055,65 @@ export default function App() {
 
         await cloudReadyPromiseRef.current;
 
-        if (credits < IMAGE_CREDIT_COST) {
-          const insufficientMessage: ChatMessage = {
-            id: botMessageId,
-            role: 'assistant',
-            content: `**Insufficient Credit Balance** (**${credits} Credits** remaining).\n\nEach generated image costs **${IMAGE_CREDIT_COST} Credits**. Watch a short ad below to get **0–${AD_REWARD_MAX} Credits**.`,
-            timestamp: Date.now(),
-            isStreaming: false,
-            isGeneratingMedia: false,
-          };
+        const clientAspect = resolveClientAspectFallback(userMessage.content);
+        let data: any = {
+          fallbackToClient: true,
+          prompt: userMessage.content,
+          ...clientAspect,
+        };
 
-          updateBotMessage(targetSessionId, botMessageId, insufficientMessage);
-          await persistThreadSafely(insufficientMessage);
-          return;
-        }
-
-        const res = await apiFetch('/api/generate-image', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            prompt: userMessage.content,
-            baseImage: options?.imageUrl,
-          }),
-          signal: abortController.signal,
-        });
-        const data = await res.json();
-        if (!res.ok) {
-          throw new Error(data.error || 'Image generation failed.');
+        try {
+          const res = await apiFetch('/api/generate-image', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              prompt: userMessage.content,
+              baseImage: options?.imageUrl,
+            }),
+            signal: abortController.signal,
+          });
+          if (res.ok) {
+            const serverJson = await res.json().catch(() => null);
+            if (serverJson && typeof serverJson === 'object') {
+              data = serverJson;
+            }
+          }
+        } catch (imgErr: any) {
+          if (imgErr?.name === 'AbortError') throw imgErr;
+          // Gracefully continue with client-side 4K Ultra-HD multi-tier neural cluster
         }
 
         let finalImageUrl = data.imageUrl;
         if (data.fallbackToClient || !finalImageUrl) {
           finalImageUrl = await generateClientImageFallback(
             data.prompt || userMessage.content,
-            data.targetWidth || 1024,
-            data.targetHeight || 1024,
-            data.enhancedPrompt
+            data.targetWidth || clientAspect.targetWidth,
+            data.targetHeight || clientAspect.targetHeight,
+            data.enhancedPrompt,
+            data.negatives,
+            data.genWidth || clientAspect.genWidth,
+            data.genHeight || clientAspect.genHeight,
+            data.sdWidth || clientAspect.sdWidth,
+            data.sdHeight || clientAspect.sdHeight,
+            data.zImageEnum || clientAspect.zImageEnum,
+            data.qwenRatio || clientAspect.qwenRatio,
+            (progressText) => {
+              updateBotMessage(targetSessionId, botMessageId, {
+                mediaProgressLabel: progressText,
+              });
+            }
           );
         }
 
         if (!finalImageUrl) {
-          throw new Error('Could not render this image right now. Please try refining your prompt.');
+          throw new Error('Glitch AI could not complete rendering this visual right now. Click Retry Generation below to try again.');
         }
 
-        // Atomically deduct 10 credits from signed-in Firebase account once generation succeeded
-        let remainingCredits = credits;
-        try {
-          remainingCredits = await deductUserCredits(currentUser.uid, IMAGE_CREDIT_COST);
-          setCredits(remainingCredits);
-        } catch (creditErr: any) {
-          if (creditErr?.message === 'INSUFFICIENT_CREDITS') {
-            const raceInsufficientMsg: ChatMessage = {
-              id: botMessageId,
-              role: 'assistant',
-              content: `**Insufficient Credit Balance** (**0 Credits** remaining).\n\nEach generated image costs **${IMAGE_CREDIT_COST} Credits**. Watch a short ad below to get **0–${AD_REWARD_MAX} Credits**.`,
-              timestamp: Date.now(),
-              isStreaming: false,
-              isGeneratingMedia: false,
-            };
-            updateBotMessage(targetSessionId, botMessageId, raceInsufficientMsg);
-            return;
-          }
-          throw creditErr;
-        }
-
+        const resLabel = data.resolution || `${data.targetWidth || clientAspect.targetWidth}x${data.targetHeight || clientAspect.targetHeight}`;
         const finalBotMessage: ChatMessage = {
           id: botMessageId,
           role: 'assistant',
-          content: `Generated visual for: "${userMessage.content}" *(${IMAGE_CREDIT_COST} Credits used · ${remainingCredits} left)*`,
+          content: formatGeneratedImageCaption(data.aspectRatio || clientAspect.aspectRatio, resLabel),
           timestamp: Date.now(),
           isStreaming: false,
           isGeneratingMedia: false,

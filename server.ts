@@ -241,14 +241,14 @@ app.post("/api/generate-image", async (req, res) => {
 
 app.post("/api/process-image", async (req, res) => {
   try {
-    const { imageBase64, targetWidth = 1024, targetHeight = 1024 } = req.body || {};
+    const { imageBase64, targetWidth = 2160, targetHeight = 2160 } = req.body || {};
     if (!imageBase64 || typeof imageBase64 !== "string") {
       return res.status(400).json({ error: "Missing imageBase64 payload" });
     }
     const result = await processImageBase64(
       imageBase64,
-      Number(targetWidth) || 1024,
-      Number(targetHeight) || 1024
+      Number(targetWidth) || 2160,
+      Number(targetHeight) || 2160
     );
     return res.json(result);
   } catch (err: any) {

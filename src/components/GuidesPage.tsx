@@ -12,7 +12,7 @@ import {
   ArrowLeft,
 } from 'lucide-react';
 import { AppView } from '../types';
-import { AD_REWARD_MAX, GLITCH_AI_VERSION, IMAGE_CREDIT_COST, INITIAL_CREDITS } from '../lib/credits';
+import { AD_REWARD_MAX, GLITCH_AI_VERSION, INITIAL_CREDITS } from '../lib/credits';
 
 interface GuidesPageProps {
   onNavigate: (view: AppView) => void;
@@ -93,7 +93,7 @@ const GUIDES_LIST: GuideItem[] = [
     prompt:
       'A glowing bioluminescent redwood forest at twilight with crystal streams and soft volumetric light beams, 8k photorealistic.',
     explanation:
-      'Generates a high-resolution visual directly from your prompt. Video generation is Coming Soon.',
+      'Generates a crisp 4K Ultra-HD visual directly from your prompt. Video generation is Coming Soon.',
     recommendedMode: 'Image',
     mode: 'image',
   },
@@ -171,8 +171,8 @@ export const GuidesPage: React.FC<GuidesPageProps> = ({
           </h1>
           <p className="text-sm text-slate-300 leading-relaxed">
             {isSignedIn
-              ? 'Explore prompts for research, coding, credit-powered image creation, and voice workflows.'
-              : 'Explore prompts for live internet research, coding solutions, strategy, and voice workflows.'}
+              ? 'Explore prompts for research, coding with live preview, unlimited 4K Ultra-HD images, and voice workflows.'
+              : 'Explore prompts for live internet research, coding solutions with live preview, strategy, and voice workflows.'}
           </p>
         </div>
 
@@ -213,9 +213,9 @@ export const GuidesPage: React.FC<GuidesPageProps> = ({
                 <div className="w-8 h-8 rounded-lg bg-fuchsia-500/15 text-fuchsia-400 flex items-center justify-center mb-2.5">
                   <Sparkles className="w-4 h-4" />
                 </div>
-                <h3 className="text-xs font-bold text-white mb-1">4. {INITIAL_CREDITS} Credits &amp; Transfers</h3>
+                <h3 className="text-xs font-bold text-white mb-1">4. Unlimited 4K &amp; Credits</h3>
                 <p className="text-[11px] text-slate-400 leading-relaxed">
-                  Start with {INITIAL_CREDITS} Credits ({IMAGE_CREDIT_COST} per image), get 0–{AD_REWARD_MAX} Credits per ad, or send Credits to friends.
+                  Create unlimited 4K Ultra-HD images free with zero API keys, start with {INITIAL_CREDITS} Credits, get 0–{AD_REWARD_MAX} Credits per ad, or send Credits to friends.
                 </p>
               </div>
             </>
@@ -229,7 +229,7 @@ export const GuidesPage: React.FC<GuidesPageProps> = ({
                 { id: 'all', label: 'All Guides' },
                 { id: 'research', label: 'Research' },
                 { id: 'code', label: 'Code & Dev' },
-                { id: 'media', label: 'Images' },
+                ...(isSignedIn ? ([{ id: 'media', label: 'Images' }] as const) : []),
                 { id: 'productivity', label: 'Strategy' },
               ] as const
             ).map((cat) => (

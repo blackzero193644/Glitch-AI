@@ -3,8 +3,11 @@ import {
   getAuth,
   GoogleAuthProvider,
   signInWithPopup,
-  signInWithRedirect,
   getRedirectResult,
+  setPersistence,
+  browserLocalPersistence,
+  browserSessionPersistence,
+  inMemoryPersistence,
   signOut,
   onAuthStateChanged,
   User as FirebaseUser,
@@ -45,12 +48,35 @@ export const auth = getAuth(app);
 export const googleProvider = new GoogleAuthProvider();
 googleProvider.setCustomParameters({ prompt: 'select_account' });
 
-if (typeof window !== 'undefined' && (window.location.protocol === 'http:' || window.location.protocol === 'https:')) {
-  getRedirectResult(auth).catch((err) => {
-    if (err?.code && err.code !== 'auth/no-auth-event') {
-      console.warn('[Firebase Auth] Redirect result note:', err.code);
+let pendingRedirectError: any = null;
+const authInitPromise: Promise<void> = (async () => {
+  try {
+    await setPersistence(auth, browserLocalPersistence);
+  } catch {
+    try {
+      await setPersistence(auth, browserSessionPersistence);
+    } catch {
+      try {
+        await setPersistence(auth, inMemoryPersistence);
+      } catch {}
     }
-  });
+  }
+  if (typeof window !== 'undefined' && (window.location.protocol === 'http:' || window.location.protocol === 'https:')) {
+    try {
+      await getRedirectResult(auth);
+    } catch (err: any) {
+      if (err?.code && err.code !== 'auth/no-auth-event') {
+        pendingRedirectError = err;
+        console.warn('[Firebase Auth] Redirect result note:', err.code);
+      }
+    }
+  }
+})();
+
+export function consumePendingRedirectError(): any {
+  const err = pendingRedirectError;
+  pendingRedirectError = null;
+  return err;
 }
 
 async function testConnection() {
@@ -112,6 +138,8 @@ export function handleFirestoreError(error: unknown, operationType: OperationTyp
   throw new Error(JSON.stringify(errInfo));
 }
 
+let activeSignInPromise: Promise<FirebaseUser | null> | null = null;
+
 export async function signInWithGoogle(): Promise<FirebaseUser | null> {
   if (
     typeof window !== 'undefined' &&
@@ -124,17 +152,31 @@ export async function signInWithGoogle(): Promise<FirebaseUser | null> {
     err.code = 'auth/operation-not-supported-in-this-environment';
     throw err;
   }
-  try {
-    const result = await signInWithPopup(auth, googleProvider);
-    return result.user;
-  } catch (err: any) {
-    if (err?.code === 'auth/popup-blocked' || err?.code === 'auth/cancelled-popup-request') {
-      await signInWithRedirect(auth, googleProvider);
-      return null;
-    }
-    console.error('Google Sign-In failed:', err);
-    throw err;
+
+  if (activeSignInPromise) {
+    return activeSignInPromise;
   }
+
+  activeSignInPromise = (async () => {
+    await authInitPromise;
+    try {
+      const result = await signInWithPopup(auth, googleProvider);
+      return result.user;
+    } catch (err: any) {
+      if (err?.code === 'auth/cancelled-popup-request') {
+        // Retry once cleanly after a tiny tick in case a stale request just settled
+        await new Promise((r) => setTimeout(r, 150));
+        const retryResult = await signInWithPopup(auth, googleProvider);
+        return retryResult.user;
+      }
+      console.error('Google Sign-In failed:', err?.code || err);
+      throw err;
+    } finally {
+      activeSignInPromise = null;
+    }
+  })();
+
+  return activeSignInPromise;
 }
 
 export async function logOut(): Promise<void> {
@@ -142,7 +184,18 @@ export async function logOut(): Promise<void> {
 }
 
 export function onAuthChange(callback: (user: FirebaseUser | null) => void) {
-  return onAuthStateChanged(auth, callback);
+  let active = true;
+  let unsubscribeInner: (() => void) | null = null;
+
+  authInitPromise.finally(() => {
+    if (!active) return;
+    unsubscribeInner = onAuthStateChanged(auth, callback);
+  });
+
+  return () => {
+    active = false;
+    if (unsubscribeInner) unsubscribeInner();
+  };
 }
 
 function clampCredits(val: unknown): number {
@@ -319,7 +372,8 @@ export async function fetchCloudUserProfile(userId: string): Promise<UserProfile
 
 export function subscribeToUserProfile(
   userId: string,
-  onProfile: (profile: UserProfile) => void
+  onProfile: (profile: UserProfile) => void,
+  onError?: (err: unknown) => void
 ): Unsubscribe {
   const path = `users/${userId}`;
   const userRef = doc(db, 'users', userId);
@@ -331,7 +385,8 @@ export function subscribeToUserProfile(
       }
     },
     (error) => {
-      handleFirestoreError(error, OperationType.GET, path);
+      console.warn(`[Firestore] Profile listener note (${path}):`, error?.message || error);
+      onError?.(error);
     }
   );
 }
@@ -598,20 +653,22 @@ export function subscribeToIncomingTransfers(
   onPendingTransfers: (transfers: CreditTransferRecord[]) => void
 ): Unsubscribe {
   const path = 'creditTransfers';
+  // Single equality filter avoids requiring a composite Firestore index
   const q = query(
     collection(db, 'creditTransfers'),
-    where('toUserId', '==', userId),
-    where('status', '==', 'pending')
+    where('toUserId', '==', userId)
   );
 
   return onSnapshot(
     q,
     (snapshot) => {
-      const pending = snapshot.docs.map((d) => mapTransferDoc(d.id, d.data()));
+      const pending = snapshot.docs
+        .map((d) => mapTransferDoc(d.id, d.data()))
+        .filter((tx) => tx.status === 'pending');
       onPendingTransfers(pending);
     },
     (error) => {
-      handleFirestoreError(error, OperationType.LIST, path);
+      console.warn(`[Firestore] Incoming transfers listener note (${path}):`, error?.message || error);
     }
   );
 }

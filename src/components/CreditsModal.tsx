@@ -18,7 +18,6 @@ import {
 import {
   AD_REWARD_MAX,
   GLITCH_AI_VERSION,
-  IMAGE_CREDIT_COST,
   MAX_TRANSFER_CREDITS,
   getRandomAdsterraSmartLink,
 } from '../lib/credits';
@@ -191,7 +190,6 @@ export const CreditsModal: React.FC<CreditsModalProps> = ({
     }
   };
 
-  const remainingImages = Math.floor(credits / IMAGE_CREDIT_COST);
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/75 backdrop-blur-xs animate-in fade-in duration-200">
@@ -226,9 +224,9 @@ export const CreditsModal: React.FC<CreditsModalProps> = ({
               </div>
             </div>
             <div className="text-right text-[11px] text-slate-400">
-              <div>{IMAGE_CREDIT_COST} Credits / image</div>
+              <div>4K Ultra-HD Images</div>
               <div className="text-cyan-300 font-medium mt-0.5">
-                {remainingImages} {remainingImages === 1 ? 'image' : 'images'} ready
+                Unlimited · Free
               </div>
             </div>
           </div>

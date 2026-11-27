@@ -12,11 +12,11 @@ function buildOfflineKnowledgeVaultJson(): string {
     {
       topic: 'Glitch AI v1.0 Architecture & Capabilities',
       category: 'Platform Guide',
-      keywords: ['glitch', 'alfateh', 'version', 'credits', 'voice', 'image', 'pdf', 'export'],
+      keywords: ['glitch', 'alfateh', 'version', 'credits', 'voice', 'image', 'transcript', 'export', 'preview'],
       summary:
-        'Glitch AI v1.0 by Al-Fateh unifies real-time web-connected chat, multilingual Fish Audio voice calling, credit-powered image generation, lucky 0-10 ad rewards, user-to-user credit transfers, and multi-page PDF exports.',
+        'Glitch AI v1.0 by Al-Fateh unifies real-time web-connected chat, interactive live code previews, multilingual voice calling, unlimited 4K Ultra-HD image generation without API keys, lucky 0-10 ad rewards, user-to-user credit transfers, and clean formatted document exports.',
       details:
-        'Every generated image uses 10 Credits when signed in. Users can earn 0-10 lucky Credits by watching a sponsored ad and transfer Credits directly to friends via Email or Account ID.',
+        '4K Ultra-HD image generation is unlimited and key-free when signed in. Users can earn 0-10 lucky Credits by watching a sponsored ad and transfer Credits directly to friends via Email or Account ID, or contact Al-Fateh at alfateh@cc.cc.',
     },
     {
       topic: 'JavaScript & TypeScript Async Patterns',

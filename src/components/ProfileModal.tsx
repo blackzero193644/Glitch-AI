@@ -12,7 +12,7 @@ import {
   PlayCircle,
 } from 'lucide-react';
 import { UserProfile } from '../types';
-import { AD_REWARD_MAX, GLITCH_AI_VERSION, IMAGE_CREDIT_COST, INITIAL_CREDITS } from '../lib/credits';
+import { AD_REWARD_MAX, GLITCH_AI_VERSION, INITIAL_CREDITS } from '../lib/credits';
 
 interface ProfileModalProps {
   isOpen: boolean;
@@ -171,7 +171,6 @@ export const ProfileModal: React.FC<ProfileModalProps> = ({
 
   const selectedColorObj = AVATAR_COLORS.find((c) => c.id === avatarColor) || AVATAR_COLORS[0];
   const creditPercent = Math.max(0, Math.min(100, Math.round((credits / INITIAL_CREDITS) * 100)));
-  const remainingImages = Math.floor(credits / IMAGE_CREDIT_COST);
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/75 backdrop-blur-xs animate-in fade-in duration-200">
@@ -205,7 +204,7 @@ export const ProfileModal: React.FC<ProfileModalProps> = ({
               <div>
                 <div className="text-xs font-bold text-white uppercase tracking-wider">Credit Balance</div>
                 <div className="text-[11px] text-slate-400">
-                  {IMAGE_CREDIT_COST} Credits per image · {remainingImages} {remainingImages === 1 ? 'image' : 'images'} available
+                  4K Ultra-HD Images Unlimited &amp; Free · Earn &amp; Transfer Credits
                 </div>
               </div>
             </div>
@@ -214,19 +213,13 @@ export const ProfileModal: React.FC<ProfileModalProps> = ({
               <div className="text-xl font-extrabold font-mono tabular-nums text-white leading-none">
                 {credits}
               </div>
-              <div className="text-[10px] text-cyan-400 font-medium mt-0.5">Credits Left</div>
+              <div className="text-[10px] text-cyan-400 font-medium mt-0.5">Credits</div>
             </div>
           </div>
 
           <div className="w-full h-2 rounded-full bg-[#04060f] border border-[#192241] overflow-hidden mb-3">
             <div
-              className={`h-full transition-all duration-300 ${
-                credits <= IMAGE_CREDIT_COST
-                  ? 'bg-rose-500'
-                  : credits <= 30
-                  ? 'bg-amber-400'
-                  : 'bg-gradient-to-r from-cyan-400 to-fuchsia-400'
-              }`}
+              className="h-full transition-all duration-300 bg-gradient-to-r from-cyan-400 to-fuchsia-400"
               style={{ width: `${creditPercent}%` }}
             />
           </div>

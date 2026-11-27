@@ -138,8 +138,48 @@ export const ChatMessageItem: React.FC<ChatMessageItemProps> = ({
       .replace(/[#*_~>]/g, '');
 
     const utterance = new SpeechSynthesisUtterance(cleanText);
-    utterance.rate = 1.0;
-    utterance.pitch = 1.0;
+    const maleVoices = new Set(['ethan', 'adrian', 'verity', 'guyzo', 'polo', 'kai', 'slax']);
+    const isMale = maleVoices.has(savedVoice);
+    const pitchMap: Record<string, number> = {
+      sarah: 1.08,
+      hannah: 1.04,
+      selene: 0.96,
+      alle: 1.14,
+      lyra: 1.02,
+      ethan: 0.92,
+      adrian: 0.86,
+      verity: 0.98,
+      guyzo: 0.78,
+      polo: 0.84,
+      kai: 1.02,
+      slax: 0.88,
+    };
+    const rateMap: Record<string, number> = {
+      sarah: 1.0,
+      hannah: 1.0,
+      selene: 0.94,
+      alle: 1.05,
+      lyra: 0.96,
+      ethan: 1.0,
+      adrian: 0.95,
+      verity: 1.02,
+      guyzo: 0.94,
+      polo: 0.96,
+      kai: 1.04,
+      slax: 0.98,
+    };
+    const available = window.speechSynthesis.getVoices?.() || [];
+    if (available.length > 0) {
+      const genderHint = isMale
+        ? /\b(david|mark|guy|daniel|ryan|christopher|george|andrew|brian|alex|male|eric)\b/i
+        : /\b(zira|jenny|aria|ava|emma|samantha|victoria|karen|hazel|susan|female|sonia|libby)\b/i;
+      const matched =
+        available.find((v) => v.lang?.toLowerCase().startsWith('en') && genderHint.test(v.name)) ||
+        available.find((v) => v.lang?.toLowerCase().startsWith('en'));
+      if (matched) utterance.voice = matched;
+    }
+    utterance.rate = rateMap[savedVoice] ?? 1.0;
+    utterance.pitch = pitchMap[savedVoice] ?? (isMale ? 0.9 : 1.05);
     utterance.onend = () => setIsSpeaking(false);
     utterance.onerror = () => setIsSpeaking(false);
 
@@ -266,10 +306,10 @@ export const ChatMessageItem: React.FC<ChatMessageItemProps> = ({
                       <div className="text-xs font-semibold text-white">
                         {message.mediaType === 'video'
                           ? 'Generating Cloud AI Video'
-                          : 'Rendering High-Resolution Image'}
+                          : 'Rendering 4K Ultra-HD Image'}
                       </div>
                       <div className="text-[11px] text-slate-400 mt-0.5">
-                        {message.mediaProgressLabel || 'Crafting visuals from your prompt...'}
+                        {message.mediaProgressLabel || 'Crafting 4K Ultra-HD visuals...'}
                       </div>
                     </div>
                   </div>
@@ -281,7 +321,8 @@ export const ChatMessageItem: React.FC<ChatMessageItemProps> = ({
                     <div className="relative group">
                       <img
                         src={message.generatedImageUrl}
-                        alt={message.content || 'Generated visual'}
+                        alt="Glitch AI 4K Ultra-HD visual"
+                        referrerPolicy="no-referrer"
                         onClick={() => setLightboxUrl(message.generatedImageUrl || null)}
                         className="w-full max-h-[460px] object-contain bg-black cursor-zoom-in"
                       />
@@ -300,13 +341,13 @@ export const ChatMessageItem: React.FC<ChatMessageItemProps> = ({
                         onClick={() =>
                           triggerDownload(
                             message.generatedImageUrl!,
-                            `Glitch_AI_${message.id}.jpg`
+                            `Glitch_AI_4K_${message.id}.jpg`
                           )
                         }
                         className="flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-[#0d142c] hover:bg-[#142044] border border-cyan-500/35 text-xs font-medium text-cyan-300 transition-colors cursor-pointer"
                       >
                         <Download className="w-3.5 h-3.5" />
-                        <span>Download Image</span>
+                        <span>Download 4K Ultra-HD</span>
                       </button>
                     </div>
                   </div>
@@ -493,6 +534,7 @@ export const ChatMessageItem: React.FC<ChatMessageItemProps> = ({
           <img
             src={lightboxUrl}
             alt="Full view"
+            referrerPolicy="no-referrer"
             onClick={(e) => e.stopPropagation()}
             className="max-w-full max-h-[90vh] rounded-xl object-contain shadow-2xl"
           />

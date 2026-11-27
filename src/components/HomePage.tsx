@@ -8,7 +8,7 @@ import {
   Image as ImageIcon,
 } from 'lucide-react';
 import { AppView } from '../types';
-import { AD_REWARD_MAX, GLITCH_AI_VERSION, IMAGE_CREDIT_COST } from '../lib/credits';
+import { AD_REWARD_MAX, GLITCH_AI_VERSION } from '../lib/credits';
 import { GLITCH_EMBLEM_SRC, GLITCH_LOGO_SRC } from '../lib/assets';
 import { NativeBannerAd, Banner300x250Ad, Banner320x50Ad } from './AdSlots';
 
@@ -56,7 +56,7 @@ export const HomePage: React.FC<HomePageProps> = ({
 
         <p className="text-sm sm:text-base text-slate-400 max-w-xl mx-auto mb-8 leading-relaxed">
           {isSignedIn
-            ? 'Chat with live internet knowledge, generate high-resolution images with Credits, send Credits to friends, and talk naturally over live voice calls.'
+            ? 'Chat with live internet knowledge, generate unlimited 4K Ultra-HD images without API keys, send Credits to friends, and talk naturally over live voice calls.'
             : 'Chat with live internet knowledge, get clear coding and research answers, and talk naturally over live voice calls.'}
         </p>
 
@@ -121,9 +121,9 @@ export const HomePage: React.FC<HomePageProps> = ({
                 <div className="w-10 h-10 rounded-xl bg-fuchsia-500/15 border border-fuchsia-500/30 flex items-center justify-center text-fuchsia-400 mb-4">
                   <ImageIcon className="w-5 h-5" />
                 </div>
-                <h3 className="text-base font-semibold text-white mb-2">Credit Image Studio</h3>
+                <h3 className="text-base font-semibold text-white mb-2">Unlimited 4K Image Studio</h3>
                 <p className="text-xs text-slate-400 leading-relaxed">
-                  Create images for {IMAGE_CREDIT_COST} Credits each and watch ads to get a lucky 0–{AD_REWARD_MAX} Credits anytime. Video creation is coming soon.
+                  Create unlimited 4K Ultra-HD visuals across all aspect ratios with zero API keys, and collect lucky 0–{AD_REWARD_MAX} Credits anytime. Video creation is coming soon.
                 </p>
               </div>
 
@@ -131,9 +131,9 @@ export const HomePage: React.FC<HomePageProps> = ({
                 <div className="w-10 h-10 rounded-xl bg-indigo-500/15 border border-indigo-500/30 flex items-center justify-center text-indigo-400 mb-4">
                   <Send className="w-5 h-5" />
                 </div>
-                <h3 className="text-base font-semibold text-white mb-2">Credit Transfers &amp; PDF</h3>
+                <h3 className="text-base font-semibold text-white mb-2">Credit Transfers &amp; Archive</h3>
                 <p className="text-xs text-slate-400 leading-relaxed">
-                  Transfer Credits directly to another user by email or Account ID, and export any conversation as a PDF document.
+                  Transfer Credits directly to another user by email or Account ID, and save any conversation as a clean formatted document.
                 </p>
               </div>
             </>
@@ -153,9 +153,9 @@ export const HomePage: React.FC<HomePageProps> = ({
                 <div className="w-10 h-10 rounded-xl bg-indigo-500/15 border border-indigo-500/30 flex items-center justify-center text-indigo-400 mb-4">
                   <Send className="w-5 h-5" />
                 </div>
-                <h3 className="text-base font-semibold text-white mb-2">Instant PDF Export</h3>
+                <h3 className="text-base font-semibold text-white mb-2">Instant Transcript Save</h3>
                 <p className="text-xs text-slate-400 leading-relaxed">
-                  Save any research session, code solution, or study notes as a cleanly formatted PDF document in one click.
+                  Save any research session, code solution, or study notes as a cleanly formatted document in one click.
                 </p>
               </div>
             </>

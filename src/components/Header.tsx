@@ -144,10 +144,10 @@ export const Header: React.FC<HeaderProps> = ({
             <button
               onClick={onExportChat}
               className="flex items-center gap-1 px-2 py-1.5 rounded-lg text-xs font-medium text-slate-300 hover:text-white hover:bg-[#10162f] transition-colors cursor-pointer whitespace-nowrap"
-              title="Export conversation as PDF"
+              title="Download chat transcript"
             >
               <Download className="w-3.5 h-3.5 text-cyan-400" />
-              <span className="hidden sm:inline">PDF</span>
+              <span className="hidden sm:inline">Save Chat</span>
             </button>
 
             <button

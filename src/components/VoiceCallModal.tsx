@@ -18,6 +18,8 @@ import {
 import { GlitchVoiceId, UserProfile, VoiceOption } from '../types';
 import { apiFetch } from '../lib/api';
 import { GLITCH_EMBLEM_SRC } from '../lib/assets';
+import { tryOfflineKnowledgeFallback } from '../lib/offlineFallback';
+import { trySilentPuterChat } from '../lib/puterBridge';
 
 interface VoiceCallModalProps {
   isOpen: boolean;
@@ -48,6 +50,54 @@ const FALLBACK_VOICES: VoiceOption[] = [
   { id: 'kai', name: 'Kai', style: 'Youthful & Upbeat', gender: 'male', referenceId: '802e3bc2b27e49c2995d23ef70e6ac89' },
   { id: 'slax', name: 'Slax', style: 'Crisp & Measured', gender: 'male', referenceId: 'c5f56a6cc2ec4fa8920cb4c5889a3fb7' },
 ];
+
+const VOICE_SYNTH_PROFILES: Record<string, { gender: 'female' | 'male'; pitch: number; rate: number }> = {
+  sarah: { gender: 'female', pitch: 1.08, rate: 1.0 },
+  hannah: { gender: 'female', pitch: 1.04, rate: 1.0 },
+  selene: { gender: 'female', pitch: 0.96, rate: 0.94 },
+  alle: { gender: 'female', pitch: 1.14, rate: 1.05 },
+  lyra: { gender: 'female', pitch: 1.02, rate: 0.96 },
+  ethan: { gender: 'male', pitch: 0.92, rate: 1.0 },
+  adrian: { gender: 'male', pitch: 0.86, rate: 0.95 },
+  verity: { gender: 'male', pitch: 0.98, rate: 1.02 },
+  guyzo: { gender: 'male', pitch: 0.78, rate: 0.94 },
+  polo: { gender: 'male', pitch: 0.84, rate: 0.96 },
+  kai: { gender: 'male', pitch: 1.02, rate: 1.04 },
+  slax: { gender: 'male', pitch: 0.88, rate: 0.98 },
+};
+
+function speakWithBrowserVoice(
+  text: string,
+  voiceId: string,
+  onEnd: () => void,
+  onError: () => void
+): boolean {
+  if (typeof window === 'undefined' || !('speechSynthesis' in window)) return false;
+  try {
+    window.speechSynthesis.cancel();
+    const utt = new SpeechSynthesisUtterance(text);
+    const prof = VOICE_SYNTH_PROFILES[voiceId] || VOICE_SYNTH_PROFILES.sarah;
+    const available = window.speechSynthesis.getVoices?.() || [];
+    if (available.length > 0) {
+      const genderHint =
+        prof.gender === 'male'
+          ? /\b(david|mark|guy|daniel|ryan|christopher|george|andrew|brian|alex|male|eric)\b/i
+          : /\b(zira|jenny|aria|ava|emma|samantha|victoria|karen|hazel|susan|female|sonia|libby)\b/i;
+      const matched =
+        available.find((v) => v.lang?.toLowerCase().startsWith('en') && genderHint.test(v.name)) ||
+        available.find((v) => v.lang?.toLowerCase().startsWith('en'));
+      if (matched) utt.voice = matched;
+    }
+    utt.pitch = prof.pitch;
+    utt.rate = prof.rate;
+    utt.onend = onEnd;
+    utt.onerror = onError;
+    window.speechSynthesis.speak(utt);
+    return true;
+  } catch {
+    return false;
+  }
+}
 
 function isLikelySelfEcho(heardText: string, lastAiText: string, endedAt: number): boolean {
   if (!heardText || !lastAiText) return false;
@@ -131,6 +181,8 @@ export const VoiceCallModal: React.FC<VoiceCallModalProps> = ({
   const vadRafRef = useRef<number | null>(null);
   const stopCurrentRecorderRef = useRef<((discard: boolean) => void) | null>(null);
   const forceSendCurrentRecorderRef = useRef<(() => void) | null>(null);
+  const speechRecRef = useRef<any>(null);
+  const capturedBrowserSpeechRef = useRef<{ text: string; ts: number }>({ text: '', ts: 0 });
 
   const isOpenRef = useRef(isOpen);
   const isMicMutedRef = useRef(isMicMuted);
@@ -266,7 +318,49 @@ export const VoiceCallModal: React.FC<VoiceCallModalProps> = ({
     } catch {}
   };
 
+  const stopBrowserSpeechRecognition = () => {
+    if (speechRecRef.current) {
+      try {
+        speechRecRef.current.onresult = null;
+        speechRecRef.current.onerror = null;
+        speechRecRef.current.onend = null;
+        speechRecRef.current.stop();
+      } catch {}
+      speechRecRef.current = null;
+    }
+  };
+
+  const startBrowserSpeechRecognition = () => {
+    stopBrowserSpeechRecognition();
+    try {
+      const RecCtor = (window as any).SpeechRecognition || (window as any).webkitSpeechRecognition;
+      if (!RecCtor) return;
+      const sr = new RecCtor();
+      sr.continuous = true;
+      sr.interimResults = true;
+      sr.onresult = (event: any) => {
+        if (statusRef.current !== 'listening' || isMicMutedRef.current) return;
+        let combined = '';
+        for (let i = event.resultIndex || 0; i < event.results.length; i++) {
+          const part = event.results[i]?.[0]?.transcript;
+          if (part) combined += part + ' ';
+        }
+        const clean = combined.trim();
+        if (clean) {
+          capturedBrowserSpeechRef.current = { text: clean, ts: Date.now() };
+        }
+      };
+      sr.onerror = () => {};
+      sr.onend = () => {
+        speechRecRef.current = null;
+      };
+      sr.start();
+      speechRecRef.current = sr;
+    } catch {}
+  };
+
   const cleanupPersistentMic = () => {
+    stopBrowserSpeechRecognition();
     if (vadRafRef.current !== null) {
       cancelAnimationFrame(vadRafRef.current);
       vadRafRef.current = null;
@@ -484,8 +578,28 @@ export const VoiceCallModal: React.FC<VoiceCallModalProps> = ({
           if (data.ignoredEcho || data.empty || !data.userText) {
             inFlightTurnRef.current = false;
             turnAbortRef.current = null;
+
+            const recentBrowserText =
+              Date.now() - capturedBrowserSpeechRef.current.ts < 8000
+                ? capturedBrowserSpeechRef.current.text.trim()
+                : '';
+            capturedBrowserSpeechRef.current = { text: '', ts: 0 };
+
+            if (
+              data.empty &&
+              recentBrowserText &&
+              !isLikelySelfEcho(
+                recentBrowserText,
+                lastAssistantSpokenRef.current.text,
+                lastAssistantSpokenRef.current.endedAt
+              )
+            ) {
+              await sendVoiceTurn(recentBrowserText, epoch);
+              return;
+            }
+
             if (data.empty) {
-              setLiveHint("Didn't catch clear words — speak closer or tap Orb to send.");
+              setLiveHint("Didn't catch clear words — speak closer or type below.");
               setTimeout(() => setLiveHint((h) => (h.includes("Didn't catch") ? '' : h)), 2200);
             }
             if (!isMicMutedRef.current) {
@@ -498,6 +612,8 @@ export const VoiceCallModal: React.FC<VoiceCallModalProps> = ({
             }
             return;
           }
+
+          capturedBrowserSpeechRef.current = { text: '', ts: 0 };
 
           const userTurn: CallTurn = {
             id: `u_${Date.now()}_${Math.random().toString(36).slice(2, 6)}`,
@@ -526,6 +642,15 @@ export const VoiceCallModal: React.FC<VoiceCallModalProps> = ({
           if (trErr?.name === 'AbortError' || epoch !== callEpochRef.current || !isOpenRef.current) {
             return;
           }
+          const recentBrowserText =
+            Date.now() - capturedBrowserSpeechRef.current.ts < 8000
+              ? capturedBrowserSpeechRef.current.text.trim()
+              : '';
+          capturedBrowserSpeechRef.current = { text: '', ts: 0 };
+          if (recentBrowserText) {
+            await sendVoiceTurn(recentBrowserText, epoch);
+            return;
+          }
           setErrorText(trErr?.message || 'Speech recognition had trouble — please try again.');
           if (!isMicMutedRef.current) {
             setStatus('listening');
@@ -541,7 +666,9 @@ export const VoiceCallModal: React.FC<VoiceCallModalProps> = ({
     };
 
     try {
+      capturedBrowserSpeechRef.current = { text: '', ts: 0 };
       rec.start(100);
+      startBrowserSpeechRecognition();
       setStatus('listening');
       statusRef.current = 'listening';
       setIsSpeechDetected(false);
@@ -866,18 +993,19 @@ export const VoiceCallModal: React.FC<VoiceCallModalProps> = ({
       try {
         await audio.play();
       } catch {
-        // Fallback cleanly to SpeechSynthesis if browser blocked HTMLAudioElement before gesture
-        if (speakingEpochRef.current === mySpeakEpoch && 'speechSynthesis' in window) {
-          const utt = new SpeechSynthesisUtterance(replyText);
-          utt.onend = () => {
-            if (speakingEpochRef.current === mySpeakEpoch) resumeAfterSpeaking();
-          };
-          utt.onerror = () => {
-            if (speakingEpochRef.current === mySpeakEpoch) resumeAfterSpeaking();
-          };
-          window.speechSynthesis.speak(utt);
-        } else if (speakingEpochRef.current === mySpeakEpoch) {
-          resumeAfterSpeaking();
+        // Fallback cleanly to configured browser voice if browser blocked HTMLAudioElement before gesture
+        if (speakingEpochRef.current === mySpeakEpoch) {
+          const started = speakWithBrowserVoice(
+            replyText,
+            voiceRef.current,
+            () => {
+              if (speakingEpochRef.current === mySpeakEpoch) resumeAfterSpeaking();
+            },
+            () => {
+              if (speakingEpochRef.current === mySpeakEpoch) resumeAfterSpeaking();
+            }
+          );
+          if (!started) resumeAfterSpeaking();
         }
       }
     } else if (!isSpeakerMutedRef.current && 'speechSynthesis' in window) {
@@ -886,14 +1014,17 @@ export const VoiceCallModal: React.FC<VoiceCallModalProps> = ({
       setStatus('speaking');
       statusRef.current = 'speaking';
       playbackStartedAtRef.current = Date.now();
-      const utt = new SpeechSynthesisUtterance(replyText);
-      utt.onend = () => {
-        if (speakingEpochRef.current === mySpeakEpoch) resumeAfterSpeaking();
-      };
-      utt.onerror = () => {
-        if (speakingEpochRef.current === mySpeakEpoch) resumeAfterSpeaking();
-      };
-      window.speechSynthesis.speak(utt);
+      const started = speakWithBrowserVoice(
+        replyText,
+        voiceRef.current,
+        () => {
+          if (speakingEpochRef.current === mySpeakEpoch) resumeAfterSpeaking();
+        },
+        () => {
+          if (speakingEpochRef.current === mySpeakEpoch) resumeAfterSpeaking();
+        }
+      );
+      if (!started) resumeAfterSpeaking();
     } else {
       resumeAfterSpeaking();
     }
@@ -943,20 +1074,32 @@ export const VoiceCallModal: React.FC<VoiceCallModalProps> = ({
     turnAbortRef.current = abortController;
 
     try {
-      const res = await apiFetch('/api/call', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          messages: nextTurns.map((t) => ({ role: t.role, content: t.content })),
-          voice: voiceRef.current,
-          userProfile,
-        }),
-        signal: abortController.signal,
-      });
+      let data: any = null;
+      try {
+        const res = await apiFetch('/api/call', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            messages: nextTurns.map((t) => ({ role: t.role, content: t.content })),
+            voice: voiceRef.current,
+            userProfile,
+          }),
+          signal: abortController.signal,
+        });
+        const parsed = await res.json().catch(() => null);
+        if (res.ok && parsed?.text) {
+          data = parsed;
+        }
+      } catch (fetchErr: any) {
+        if (fetchErr?.name === 'AbortError') throw fetchErr;
+      }
 
-      const data = await res.json();
-      if (!res.ok) {
-        throw new Error(data.error || 'Voice call connection interrupted.');
+      if (!data) {
+        const offlineText =
+          (await trySilentPuterChat(nextTurns.map((t) => ({ role: t.role, content: t.content })))) ||
+          tryOfflineKnowledgeFallback(trimmed) ||
+          'I am right here on the call with you — could you repeat that once more?';
+        data = { text: offlineText };
       }
 
       if (epoch !== callEpochRef.current || !isOpenRef.current) {
@@ -999,36 +1142,45 @@ export const VoiceCallModal: React.FC<VoiceCallModalProps> = ({
     e.stopPropagation();
     if (previewingVoiceId === v.id) {
       stopPreviewAudio();
+      if ('speechSynthesis' in window) window.speechSynthesis.cancel();
       return;
     }
 
     stopPreviewAudio();
     setPreviewingVoiceId(v.id);
+    const displayName = getVoiceDisplayName(v);
+    const sampleLine = `Hello, I am ${displayName}, speaking on Glitch AI.`;
+
     try {
-      const displayName = getVoiceDisplayName(v);
       const res = await apiFetch('/api/tts', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          text: `Hello, I am ${displayName}, speaking on Glitch AI.`,
+          text: sampleLine,
           voice: v.id,
         }),
       });
-      if (!res.ok) {
-        setPreviewingVoiceId(null);
-        return;
+      if (res.ok) {
+        const data = await res.json().catch(() => null);
+        if (data?.audioBase64) {
+          const audio = new Audio(`data:${data.mimeType || 'audio/mpeg'};base64,${data.audioBase64}`);
+          previewAudioRef.current = audio;
+          audio.onended = () => setPreviewingVoiceId(null);
+          audio.onerror = () => setPreviewingVoiceId(null);
+          await audio.play();
+          return;
+        }
       }
-      const data = await res.json();
-      if (data.audioBase64) {
-        const audio = new Audio(`data:${data.mimeType || 'audio/mpeg'};base64,${data.audioBase64}`);
-        previewAudioRef.current = audio;
-        audio.onended = () => setPreviewingVoiceId(null);
-        audio.onerror = () => setPreviewingVoiceId(null);
-        await audio.play().catch(() => setPreviewingVoiceId(null));
-      } else {
-        setPreviewingVoiceId(null);
-      }
-    } catch {
+    } catch {}
+
+    // Reliable browser voice synthesis preview fallback
+    const started = speakWithBrowserVoice(
+      sampleLine,
+      v.id,
+      () => setPreviewingVoiceId(null),
+      () => setPreviewingVoiceId(null)
+    );
+    if (!started) {
       setPreviewingVoiceId(null);
     }
   };
@@ -1168,6 +1320,9 @@ export const VoiceCallModal: React.FC<VoiceCallModalProps> = ({
                         <>
                           <div className="text-xs font-semibold truncate flex items-center gap-1.5">
                             <span>{displayName}</span>
+                            <span className="text-[9px] uppercase tracking-wider px-1 py-0.5 rounded bg-[#04060f] border border-[#1d284b] text-slate-400">
+                              {v.gender === 'male' ? 'M' : 'F'}
+                            </span>
                             {isSelected && <Check className="w-3 h-3 text-cyan-400 shrink-0" />}
                           </div>
                           <div className="text-[10px] text-slate-400 truncate">{v.style}</div>

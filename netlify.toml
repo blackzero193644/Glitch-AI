@@ -9,6 +9,12 @@
   included_files = ["dist-standalone/index.html"]
 
 [[redirects]]
+  from = "/__/auth/*"
+  to = "https://startup-signal-1nzsc.firebaseapp.com/__/auth/:splat"
+  status = 200
+  force = true
+
+[[redirects]]
   from = "/api/*"
   to = "/.netlify/functions/api"
   status = 200
@@ -18,3 +24,9 @@
   from = "/*"
   to = "/index.html"
   status = 200
+
+[[headers]]
+  for = "/*"
+  [headers.values]
+    Cross-Origin-Opener-Policy = "same-origin-allow-popups"
+

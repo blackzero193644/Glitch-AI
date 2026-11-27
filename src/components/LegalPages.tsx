@@ -130,8 +130,8 @@ export const LegalPages: React.FC<LegalPagesProps> = ({ initialTab = 'privacy', 
                 <h2 className="text-sm font-bold text-white pt-2">5. Contact & Inquiries</h2>
                 <p>
                   For privacy questions or data deletion requests, contact Al-Fateh at{' '}
-                  <a href="mailto:blackzero193644@gmail.com" className="text-cyan-400 hover:underline">
-                    blackzero193644@gmail.com
+                  <a href="mailto:alfateh@cc.cc" className="text-cyan-400 hover:underline">
+                    alfateh@cc.cc
                   </a>
                   .
                 </p>
@@ -184,8 +184,8 @@ export const LegalPages: React.FC<LegalPagesProps> = ({ initialTab = 'privacy', 
                 <h2 className="text-sm font-bold text-white pt-2">6. Governing Contact</h2>
                 <p>
                   Inquiries regarding these terms should be addressed to Al-Fateh at{' '}
-                  <a href="mailto:blackzero193644@gmail.com" className="text-cyan-400 hover:underline">
-                    blackzero193644@gmail.com
+                  <a href="mailto:alfateh@cc.cc" className="text-cyan-400 hover:underline">
+                    alfateh@cc.cc
                   </a>
                   .
                 </p>

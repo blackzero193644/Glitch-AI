@@ -110,7 +110,7 @@ export const AboutContactPage: React.FC<AboutContactPageProps> = ({
             </h3>
             <p className="text-xs text-slate-400 leading-relaxed">
               {isSignedIn
-                ? 'Combines deep reasoning, visual understanding, expressive voice calls, and credit-powered image generation — with video synthesis coming soon.'
+                ? 'Generate unlimited 4K Ultra-HD visuals without API keys, enjoy expressive voice calls, and deep reasoning — with video synthesis coming soon.'
                 : 'Combines deep reasoning, live internet grounding, and expressive multilingual voice calling in a fast, uncluttered workspace.'}
             </p>
           </div>
@@ -124,8 +124,8 @@ export const AboutContactPage: React.FC<AboutContactPageProps> = ({
             </h3>
             <p className="text-xs text-slate-400 leading-relaxed">
               {isSignedIn
-                ? 'Start with 100 Credits, get lucky 0–10 Credit ad rewards, transfer Credits directly to friends, and export any conversation to PDF.'
-                : 'Built for secure, reliable access across devices with instant PDF export and strict privacy protection.'}
+                ? 'Start with 100 Credits, get lucky 0–10 Credit ad rewards, transfer Credits directly to friends, and save any conversation cleanly.'
+                : 'Built for secure, reliable access across devices with instant transcript export and strict privacy protection.'}
             </p>
           </div>
         </div>
@@ -145,10 +145,10 @@ export const AboutContactPage: React.FC<AboutContactPageProps> = ({
                 <div>
                   <div className="text-xs font-semibold text-slate-200">Support & Inquiries</div>
                   <a
-                    href="mailto:blackzero193644@gmail.com"
+                    href="mailto:alfateh@cc.cc"
                     className="text-xs text-cyan-400 hover:underline"
                   >
-                    blackzero193644@gmail.com
+                    alfateh@cc.cc
                   </a>
                 </div>
               </div>
